@@ -1,6 +1,8 @@
 import qbs
 
 CppApplication {
+    type: [ "application", "autotest" ]
+
     property pathList additionalIncludePaths: []
     property pathList additionalLibraryPaths: []
     property stringList additionalStaticLibraries: []
@@ -18,6 +20,6 @@ CppApplication {
     Group {
         qbs.install: true
         fileTagsFilter: product.type
-        qbs.installDir: "bin"
+        qbs.installDir: "tests"
     }
 }

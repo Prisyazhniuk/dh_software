@@ -21,5 +21,5 @@ void main_window::on_open_image_action_triggered()
 	auto file_name = QFileDialog::getOpenFileName( this,
 												   "Открыть изображение",
 												   QDir::currentPath(),
-												   "Изображения (*.bmp, *.png)" );
+												   "Изображения (*.bmp *.png)" );
 }
