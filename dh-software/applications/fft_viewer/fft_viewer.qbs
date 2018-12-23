@@ -10,6 +10,10 @@ DhCppApplication {
         submodules: [ "core", "gui", "widgets" ]
     }
 
+    additionalStaticLibraries: [
+        "libopencv_world400"
+    ]
+
     files: [
         "main.cpp",
         "main_window.cpp",

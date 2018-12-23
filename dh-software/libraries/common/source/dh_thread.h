@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dh_exception.h"
+#include "exceptions/dh_exception.h"
 
 #include <string>
 #include <thread>

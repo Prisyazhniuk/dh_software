@@ -15,7 +15,7 @@ CppApplication {
     cpp.cxxFlags: product.additionalCXXFlags.concat( project.additionalCXXFlags )
     cpp.includePaths: product.additionalIncludePaths.concat( project.additionalIncludePaths, product.sourceDirectory )
     cpp.libraryPaths: product.additionalLibraryPaths.concat( project.additionalLibraryPaths )
-    cpp.staticLibraries: []
+    cpp.staticLibraries: product.additionalStaticLibraries
 
     Group {
         qbs.install: true

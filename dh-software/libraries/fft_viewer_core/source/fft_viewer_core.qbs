@@ -15,4 +15,13 @@ DhCppStaticLibrary {
         "fft_viewer_core.cpp",
         "fft_viewer_core.h",
     ]
+
+    Group {
+        name: "dll"
+        qbs.install: true
+        qbs.installDir: "bin"
+        files: [
+            project.opencv_bin_path.concat("/libopencv_world400.dll")
+        ]
+    }
 }

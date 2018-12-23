@@ -1,5 +1,6 @@
 import qbs
 import qbs.Process
+import qbs.Environment
 
 Project {
     name: "dh-software"
@@ -19,15 +20,22 @@ Project {
         //"libraries/image_processing/tests/image_processing_tests.qbs",
     ]
 
-    property pathList additionalIncludePaths: []
+    property string opencv_bin_path: Environment.getEnv("OPENCV_ROOT")+"/x64/mingw/bin";
 
-    property pathList additionalLibraryPaths: []
+    property pathList additionalIncludePaths: [
+        Environment.getEnv("OPENCV_ROOT")+"/include",
+        Environment.getEnv("IPP_ROOT")+"/include"
+    ]
 
-    property stringList additionalCXXFlags: {
-        flags = [ "-Wno-unused-parameter", "-D_USE_MATH_DEFINES" ]
+    property pathList additionalLibraryPaths: [
+        Environment.getEnv("OPENCV_ROOT")+"/x64/mingw/lib",
+        Environment.getEnv("IPP_ROOT")+"/lib/intel64"
+    ]
 
-        return flags
-    }
+    property stringList additionalCXXFlags: [
+        "-Wno-unused-parameter",
+        "-D_USE_MATH_DEFINES"
+    ]
 
     AutotestRunner {}
 }
