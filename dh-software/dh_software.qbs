@@ -9,6 +9,9 @@ Project {
     references: [
         "applications/fft_viewer/fft_viewer.qbs",
 
+        "libraries/common/source/common.qbs",
+        //"libraries/common/tests/common_tests.qbs",
+
         "libraries/fft_viewer_core/source/fft_viewer_core.qbs",
         //"libraries/fft_viewer_core/tests/fft_viewer_core_tests.qbs",
 

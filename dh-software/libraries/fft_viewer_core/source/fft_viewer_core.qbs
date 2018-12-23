@@ -4,9 +4,11 @@ DhCppStaticLibrary {
     name: "fft_viewer_core"
 
     Depends { name: "image_processing" }
+    Depends { name: "common" }
 
     Export {
         Depends { name: "image_processing" }
+        Depends { name: "common" }
     }
 
     files: [
