@@ -17,11 +17,11 @@ void image_converter::convert_8u_32f( const Mat& image_8u, Mat& image_32f )
 		throw argument_exception( "input images has different size", get_exception_source() );
 	}
 
-	if( image_8u.type() != CV_8U )
-		throw argument_exception( "image_8u has wrong format", get_exception_source() );
+	if( image_8u.depth() != CV_8U )
+		throw argument_exception( "image_8u has wrong depth", get_exception_source() );
 
-	if( image_32f.type() != CV_32F )
-		throw argument_exception( "image_32f has wrong format", get_exception_source() );
+	if( image_32f.depth() != CV_32F )
+		throw argument_exception( "image_32f has wrong depth", get_exception_source() );
 
 	IppiSize roi = { image_8u.cols, image_8u.rows };
 
@@ -55,11 +55,11 @@ void image_converter::convert_32f_8u( const Mat& image_32f, Mat& image_8u )
 		throw argument_exception( "input images has different size", get_exception_source() );
 	}
 
-	if( image_8u.type() != CV_8U )
-		throw argument_exception( "image_8u has wrong format", get_exception_source() );
+	if( image_8u.depth() != CV_8U )
+		throw argument_exception( "image_8u has wrong depth", get_exception_source() );
 
-	if( image_32f.type() != CV_32F )
-		throw argument_exception( "image_32f has wrong format", get_exception_source() );
+	if( image_32f.depth() != CV_32F )
+		throw argument_exception( "image_32f has wrong depth", get_exception_source() );
 
 
 	IppiSize roi = { image_32f.cols, image_32f.rows };
