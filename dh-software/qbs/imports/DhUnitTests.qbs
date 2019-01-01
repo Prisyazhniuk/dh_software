@@ -15,11 +15,15 @@ CppApplication {
     cpp.cxxFlags: product.additionalCXXFlags.concat( project.additionalCXXFlags )
     cpp.includePaths: product.additionalIncludePaths.concat( project.additionalIncludePaths, product.sourceDirectory )
     cpp.libraryPaths: product.additionalLibraryPaths.concat( project.additionalLibraryPaths )
-    cpp.staticLibraries: product.additionalStaticLibraries
+    cpp.staticLibraries: product.additionalStaticLibraries.concat([
+        "gtest",
+        "gtest_main",
+        "gmock"
+    ])
 
     Group {
         qbs.install: true
         fileTagsFilter: product.type
-        qbs.installDir: "tests"
+        qbs.installDir: "bin"
     }
 }
