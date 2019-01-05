@@ -4,6 +4,8 @@ DhCppStaticLibrary {
     name: "common"
 
     files: [
+        "dh_string.cpp",
+        "dh_string.h",
         "dh_thread.cpp",
         "dh_thread.h",
         "exceptions/argument_exception.h",
