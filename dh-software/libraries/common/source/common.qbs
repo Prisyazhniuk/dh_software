@@ -4,6 +4,8 @@ DhCppStaticLibrary {
     name: "common"
 
     files: [
+        "dh_math.cpp",
+        "dh_math.h",
         "dh_string.cpp",
         "dh_string.h",
         "dh_thread.cpp",
