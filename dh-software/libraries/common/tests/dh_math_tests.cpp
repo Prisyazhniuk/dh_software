@@ -1,6 +1,6 @@
 #include "dh_math.h"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace testing;
 

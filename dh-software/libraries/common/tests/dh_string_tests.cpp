@@ -1,6 +1,6 @@
 #include "dh_string.h"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace testing;
 

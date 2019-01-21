@@ -1,5 +1,6 @@
 #include "main_window.h"
 #include "fft_viewer_core.h"
+#include "image_processing.h"
 
 #include <QApplication>
 
@@ -8,10 +9,12 @@
 using namespace std;
 
 int main( int argc, char *argv[] )
-{
+{	
 	try
 	{
 		QApplication application( argc, argv );
+
+		image_processing::initialize_ipp();
 
 		fft_viewer_core core;
 		main_window main_window( &core );

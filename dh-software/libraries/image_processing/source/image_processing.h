@@ -1,11 +1,9 @@
-#ifndef IMAGE_PROCESSING_H
-#define IMAGE_PROCESSING_H
+#pragma once
 
+#include "exceptions/image_processing_exception.h"
 
 class image_processing
 {
 public:
-	image_processing();
+	static void initialize_ipp();
 };
-
-#endif // IMAGE_PROCESSING_H

@@ -12,7 +12,8 @@ DhCppStaticLibrary {
     additionalStaticLibraries: [
         "opencv_world400",
         "ippcore",
-        "ippi"
+        "ippi",
+        "ipps"
     ]
 
     files: [
@@ -20,6 +21,8 @@ DhCppStaticLibrary {
         "fft.h",
         "image_converter.cpp",
         "image_converter.h",
+        "image_processing.cpp",
+        "image_processing.h",
     ]
 
     Group {
@@ -30,6 +33,7 @@ DhCppStaticLibrary {
             project.opencv_bin_path.concat("/libopencv_world400.dll"),
             project.ipp_bin_path.concat("/ippcore.dll"),
             project.ipp_bin_path.concat("/ippi*.dll"),
+            project.ipp_bin_path.concat("/ipps*.dll"),
         ]
     }
 }
