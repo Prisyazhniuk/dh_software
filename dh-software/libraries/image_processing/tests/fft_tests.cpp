@@ -15,53 +15,49 @@ using namespace testing;
 
 TEST( fft_tests, works )
 {
-    try
-    {
-        image_processing::initialize_ipp();
+    image_processing::initialize_ipp();
 
-        auto image_8u = imread( "input.bmp", IMREAD_GRAYSCALE );
-        if( image_8u.empty() )
-            throw dh_exception( "file open error", get_exception_source() );
+    uint8_t data[] = { 0, 0,   0,   0,   0, 0, 0,
+                       0, 0,   0,   0,   0, 0, 0,
+                       0, 0, 255, 255, 255, 0, 0,
+                       0, 0, 255, 255, 255, 0, 0,
+                       0, 0, 255, 255, 255, 0, 0,
+                       0, 0,   0,   0,   0, 0, 0,
+                       0, 0,   0,   0,   0, 0, 0 };
 
-        IppiSize roi = { image_8u.cols, image_8u.rows };
+    auto image_8u = Mat( 7, 7, CV_8UC1, static_cast<void*>( data ) );
 
-        fft fft( image_8u.cols, image_8u.rows, image_8u.channels() );
+    IppiSize roi = { image_8u.cols, image_8u.rows };
 
-        auto cols = fft.get_width();
-        auto rows = fft.get_height();
+    fft fft( image_8u.cols, image_8u.rows, image_8u.channels() );
 
-        auto image_32f = Mat( rows, cols, CV_32FC1, Scalar( 0 ) );
-        auto magnitudes_32f = Mat( rows, cols, CV_32FC1 );
+    auto cols = fft.get_width();
+    auto rows = fft.get_height();
 
-        image_converter::convert_8u_32f( image_8u, image_32f, roi );
+    auto image_32f = Mat( rows, cols, CV_32FC1, Scalar( 0 ) );
+    auto magnitudes_32f = Mat( rows, cols, CV_32FC1 );
 
-        fft.forward( image_32f, magnitudes_32f );
+    image_converter::convert_8u_32f( image_8u, image_32f, roi );
 
-        // cout << magnitudes_32f << endl;
+    fft.forward( image_32f, magnitudes_32f );
 
-        double min, max;
-        minMaxLoc( magnitudes_32f, &min, &max );
+    float expected_data[] = { 2295.00000f, 1846.87330f, 765.00000f, 316.87338f, 765.00000f, 316.87338f, 765.00000f, 1846.87330f,
+                               1846.87340f, 1486.24890f, 615.62445f, 255.00000f, 615.62445f, 255.00000f, 615.62445f, 1486.24890f,
+                                765.00000f,  615.62445f, 255.00000f, 105.62446f, 255.00000f, 105.62446f, 255.00000f,  615.62445f,
+                                316.87332f,  255.00000f, 105.62446f, 43.751091f, 105.62446f, 43.751091f, 105.62446f,  255.00000f,
+                                765.00000f,  615.62445f, 255.00000f, 105.62446f, 255.00000f, 105.62446f, 255.00000f,  615.62445f,
+                                316.87332f,  255.00000f, 105.62446f, 43.751091f, 105.62446f, 43.751091f, 105.62446f,  255.00000f,
+                                765.00000f,  615.62445f, 255.00000f, 105.62446f, 255.00000f, 105.62446f, 255.00000f,  615.62445f,
+                               1846.87340f, 1486.24890f, 615.62445f, 255.00000f, 615.62445f, 255.00000f, 615.62445f, 1486.24890f };
 
-        for( int r = 0; r < magnitudes_32f.rows; r++ )
-            for( int c = 0; c < magnitudes_32f.cols; c++ )
-            {
-                auto p = magnitudes_32f.at<float>( r, c );
-                p = 255 * ( p - min ) / ( max - min );
-                magnitudes_32f.at<float>( r, c ) = p;
-            }
+    auto expected_magnitudes_32f = Mat( 8, 8, CV_32FC1, static_cast<void*>( expected_data ) );
 
-        auto result_8u = Mat( magnitudes_32f.rows, magnitudes_32f.cols, CV_8UC1 );
+    EXPECT_EQ( expected_magnitudes_32f.rows, magnitudes_32f.rows );
+    EXPECT_EQ( expected_magnitudes_32f.cols, magnitudes_32f.cols );
+    EXPECT_EQ( expected_magnitudes_32f.channels(), magnitudes_32f.channels() );
 
-        image_converter::convert_32f_8u( magnitudes_32f, result_8u );
+    auto diff = expected_magnitudes_32f != magnitudes_32f;
+    bool magnitudes_are_eq = cv::countNonZero(diff) == 0;
 
-        imwrite( "forward_fft.bmp", result_8u );
-    }
-    catch( dh_exception& ex )
-    {
-        cout << ex.c_str() << endl;
-    }
-    catch( ... )
-    {
-        cout << "unhundled exception" << endl;
-    }
+    EXPECT_TRUE( magnitudes_are_eq );
 }

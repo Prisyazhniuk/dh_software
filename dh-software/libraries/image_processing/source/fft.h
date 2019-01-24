@@ -17,7 +17,7 @@ public:
     void forward( const cv::Mat& src, cv::Mat& dst );
 
 private:
-    const int _flags = IPP_FFT_DIV_FWD_BY_N;
+    const int _flags = IPP_FFT_DIV_INV_BY_N;
     const IppHintAlgorithm _hint = ippAlgHintNone;
 
 	int _width;
