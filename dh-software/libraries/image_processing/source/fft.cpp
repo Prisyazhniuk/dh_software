@@ -8,6 +8,7 @@
 using namespace cv;
 
 fft::fft( int width, int height, int channels )
+    : _channels( channels )
 {
     uint32_t order_width;
     uint32_t order_height;
@@ -136,9 +137,9 @@ void fft::forward( const Mat& src, Mat& magnitudes )
                                                  src.rows, _height ),
                                   get_exception_source() );
 
-    if( src.channels() != 1 )
+    if( src.channels() != _channels )
         throw argument_exception( dh_string::fs( "src has wrong channels count: %d, expected: %d",
-                                                 src.channels(), 1 ),
+                                                 src.channels(), _channels ),
                                   get_exception_source() );
 
     if( src.depth() != CV_32F )
@@ -154,9 +155,9 @@ void fft::forward( const Mat& src, Mat& magnitudes )
                                                  magnitudes.rows, _height ),
                                   get_exception_source() );
 
-    if( magnitudes.channels() != 1 )
+    if( magnitudes.channels() != _channels )
         throw argument_exception( dh_string::fs( "magnitudes has wrong channels count: %d, expected: %d",
-                                                 magnitudes.channels(), 1 ),
+                                                 magnitudes.channels(), _channels ),
                                   get_exception_source() );
 
     if( magnitudes.depth() != CV_32F )

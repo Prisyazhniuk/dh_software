@@ -23,6 +23,7 @@ private:
 
 	int _width;
 	int _height;
+    int _channels;
 
     IppiFFTSpec_R_32f* _context;
 	uint8_t* _init_buffer;
