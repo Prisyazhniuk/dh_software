@@ -12,6 +12,9 @@ fft::fft( int width, int height, int channels )
     uint32_t order_width;
     uint32_t order_height;
 
+    if( channels != 1 )
+        throw argument_exception( "only one-channel images supported", get_exception_source() );
+
     auto x_order = dh_math::power_of_2( uint32_t( width ), order_width );
     auto y_order = dh_math::power_of_2( uint32_t( height ), order_height );
 
@@ -123,6 +126,42 @@ int fft::get_height()
 
 void fft::forward( const Mat& src, Mat& magnitudes )
 {
+    if( src.cols != _width )
+        throw argument_exception( dh_string::fs( "src has wrong width: %d, expected: %d",
+                                                 src.cols, _width ),
+                                  get_exception_source() );
+
+    if( src.rows != _height )
+        throw argument_exception( dh_string::fs( "src has wrong height: %d, expected: %d",
+                                                 src.rows, _height ),
+                                  get_exception_source() );
+
+    if( src.channels() != 1 )
+        throw argument_exception( dh_string::fs( "src has wrong channels count: %d, expected: %d",
+                                                 src.channels(), 1 ),
+                                  get_exception_source() );
+
+    if( src.depth() != CV_32F )
+        throw argument_exception( "src must be CV_32F image", get_exception_source() );
+
+    if( magnitudes.cols != _width )
+        throw argument_exception( dh_string::fs( "magnitudes has wrong width: %d, expected: %d",
+                                                 magnitudes.cols, _width ),
+                                  get_exception_source() );
+
+    if( magnitudes.rows != _height )
+        throw argument_exception( dh_string::fs( "magnitudes has wrong height: %d, expected: %d",
+                                                 magnitudes.rows, _height ),
+                                  get_exception_source() );
+
+    if( magnitudes.channels() != 1 )
+        throw argument_exception( dh_string::fs( "magnitudes has wrong channels count: %d, expected: %d",
+                                                 magnitudes.channels(), 1 ),
+                                  get_exception_source() );
+
+    if( magnitudes.depth() != CV_32F )
+        throw argument_exception( "magnitudes must be CV_32F image", get_exception_source() );
+
     auto status = ippiFFTFwd_RToPack_32f_C1R( src.ptr<float>(), static_cast<int>( src.step ),
                                               _coefficients.ptr<float>(), static_cast<int>( _coefficients.step ),
                                               _context, _work_buffer );
