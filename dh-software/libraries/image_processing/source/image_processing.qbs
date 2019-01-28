@@ -17,6 +17,8 @@ DhCppStaticLibrary {
     ]
 
     files: [
+        "dft.cpp",
+        "dft.h",
         "fft.cpp",
         "fft.h",
         "image_converter.cpp",
