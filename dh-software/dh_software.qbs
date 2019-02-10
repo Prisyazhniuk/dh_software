@@ -13,6 +13,9 @@ Project {
         "libraries/common/source/common.qbs",
         "libraries/common/tests/common_tests.qbs",
 
+        "libraries/qt_helpers/source/qt_helpers.qbs",
+        //"libraries/qt_helpers/tests/qt_helpers_tests.qbs",
+
         "libraries/fft_viewer_core/source/fft_viewer_core.qbs",
         //"libraries/fft_viewer_core/tests/fft_viewer_core_tests.qbs",
 
