@@ -6,6 +6,9 @@ class graphics_view_wheel_scroll : public QGraphicsView
 {
     Q_OBJECT
 
+public:
+    explicit graphics_view_wheel_scroll( QWidget *parent = nullptr );
+
 signals:
     void zoom_in( int zoom_step );
     void zoom_out( int zoom_step );

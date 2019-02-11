@@ -1,9 +1,14 @@
 #include "graphics_view_wheel_scroll.h"
 
 #if QT_CONFIG( wheelevent )
+    #include <QWheelEvent>
+#endif
 
-#include <QWheelEvent>
+graphics_view_wheel_scroll::graphics_view_wheel_scroll( QWidget* parent )
+    : QGraphicsView ( parent )
+{}
 
+#if QT_CONFIG( wheelevent )
 void graphics_view_wheel_scroll::wheelEvent( QWheelEvent* e )
 {
     if( e->modifiers() & Qt::ControlModifier )
@@ -20,5 +25,4 @@ void graphics_view_wheel_scroll::wheelEvent( QWheelEvent* e )
         QGraphicsView::wheelEvent( e );
     }
 }
-
 #endif
