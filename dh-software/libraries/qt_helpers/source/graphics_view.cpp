@@ -8,35 +8,21 @@
 
 #include <qmath.h>
 
-#if QT_CONFIG( wheelevent )
-void graphics_view_wheel_scroll::wheelEvent( QWheelEvent* e )
-{
-    if( e->modifiers() & Qt::ControlModifier )
-    {
-        if( e->delta() > 0 )
-            _view->zoom_in( 6 );
-        else
-            _view->zoom_out( 6 );
-        e->accept();
-    }
-    else
-    {
-        QGraphicsView::wheelEvent( e );
-    }
-}
-#endif
-
-graphics_view::graphics_view( const QString& name, QWidget* parent )
+graphics_view::graphics_view( QWidget* parent )
     : QFrame( parent )
 {    
     setFrameStyle( Sunken | StyledPanel );
-    _graphics_view = new graphics_view_wheel_scroll( this );
+
+    _graphics_view = new graphics_view_wheel_scroll();
     _graphics_view->setRenderHint( QPainter::Antialiasing, false );
     _graphics_view->setOptimizationFlags( QGraphicsView::DontSavePainterState );
     _graphics_view->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
     _graphics_view->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
     _graphics_view->setInteractive( true );
     _graphics_view->setDragMode( QGraphicsView::ScrollHandDrag );
+
+    QObject::connect( _graphics_view, &graphics_view_wheel_scroll::zoom_in, this, &graphics_view::zoom_in );
+    QObject::connect( _graphics_view, &graphics_view_wheel_scroll::zoom_out, this, &graphics_view::zoom_out );
 
     int size = style()->pixelMetric( QStyle::PM_ToolBarIconSize );
     QSize icon_size( size, size );
@@ -73,8 +59,6 @@ graphics_view::graphics_view( const QString& name, QWidget* parent )
 
     // Label layout
     auto label_layout = new QHBoxLayout;
-    _label = new QLabel( name );
-    _label2 = new QLabel( "Pointer Mode" );
     _select_mode_button = new QToolButton;
     _select_mode_button->setText( "Select" );
     _select_mode_button->setCheckable( true );
@@ -96,9 +80,6 @@ graphics_view::graphics_view( const QString& name, QWidget* parent )
     openGlButton->setEnabled( false );
 #endif
 
-    label_layout->addWidget( _label );
-    label_layout->addStretch();
-    label_layout->addWidget( _label2 );
     label_layout->addWidget( _select_mode_button );
     label_layout->addWidget( _drag_mode_button );
     label_layout->addStretch();
@@ -168,12 +149,12 @@ void graphics_view::toggle_antialiasing()
     _graphics_view->setRenderHint( QPainter::Antialiasing, _antialias_button->isChecked() );
 }
 
-void graphics_view::zoom_in( int level )
+void graphics_view::zoom_in( int zoom_step )
 {
-    _zoom_slider->setValue( _zoom_slider->value() + level );
+    _zoom_slider->setValue( _zoom_slider->value() + zoom_step );
 }
 
-void graphics_view::zoom_out( int level )
+void graphics_view::zoom_out( int zoom_step )
 {
-    _zoom_slider->setValue( _zoom_slider->value() - level );
+    _zoom_slider->setValue( _zoom_slider->value() - zoom_step );
 }

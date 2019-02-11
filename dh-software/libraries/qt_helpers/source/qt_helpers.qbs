@@ -18,6 +18,8 @@ DhCppStaticLibrary {
     files: [
         "graphics_view.cpp",
         "graphics_view.h",
+        "graphics_view_wheel_scroll.cpp",
+        "graphics_view_wheel_scroll.h",
         "icons.qrc",
     ]   
 }
