@@ -1,8 +1,10 @@
 #pragma once
 
 #include "fft_viewer_core.h"
+#include "graphics_view.h"
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 
 namespace Ui
 {
@@ -18,10 +20,17 @@ public:
 						  QWidget *parent = nullptr );
 	~main_window();
 
+public slots:
+    void show_image( const QPixmap& );
+
 private slots:
 	void on_open_image_action_triggered();
+    void on_fast_run_button_clicked();
 
 private:
 	fft_viewer_core* _core;
 	Ui::main_window* _ui;
+
+    QGraphicsScene* _scene;
+    graphics_view* _graphics_view;
 };

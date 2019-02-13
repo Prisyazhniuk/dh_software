@@ -6,6 +6,11 @@ DhCppStaticLibrary {
     Depends { name: "image_processing" }
     Depends { name: "common" }
 
+    Depends {
+        name: "Qt";
+        submodules: [ "core", "gui" ]
+    }
+
     Export {
         Depends { name: "image_processing" }
         Depends { name: "common" }

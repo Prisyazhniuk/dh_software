@@ -14,12 +14,17 @@ int main( int argc, char *argv[] )
 	{
 		QApplication application( argc, argv );
 
+        Q_INIT_RESOURCE( icons );
+
 		image_processing::initialize_ipp();
 
 		fft_viewer_core core;
-		main_window main_window( &core );
+        main_window main_window( &core );
+        main_window.show();
 
-		main_window.show();
+        QObject::connect( &core, &fft_viewer_core::image_processed,
+                          &main_window, &main_window::show_image );
+
 
 		return application.exec();
 	}
