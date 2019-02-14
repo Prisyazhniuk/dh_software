@@ -25,7 +25,6 @@ public slots:
 
 private slots:
 	void on_open_image_action_triggered();
-    void on_fast_run_button_clicked();
 
 private:
 	fft_viewer_core* _core;

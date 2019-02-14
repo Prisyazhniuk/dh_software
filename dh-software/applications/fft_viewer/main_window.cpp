@@ -40,6 +40,7 @@ main_window::~main_window()
 void main_window::show_image( const QPixmap& pixmap )
 {
     _scene->clear();
+    _scene->setSceneRect( pixmap.rect() );
     _scene->addPixmap( pixmap );
 }
 
@@ -49,9 +50,6 @@ void main_window::on_open_image_action_triggered()
 												   "Открыть изображение",
 												   QDir::currentPath(),
 												   "Изображения (*.bmp *.png)" );
-}
 
-void main_window::on_fast_run_button_clicked()
-{
-    _core->run( "23.05_fiber.bmp" );
+    _core->run_processing( file_name.toStdString() );
 }

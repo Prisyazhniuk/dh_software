@@ -15,13 +15,14 @@ public:
 	fft_viewer_core();
 	~fft_viewer_core();
 
-    void run( const std::string& image_path );
+    void run_processing( const std::string& image_path );
 
 signals:
     void image_processed( const QPixmap& );
 
 
 private:
+    void stop();
     void processing_thread( const std::string& image_path );
 
 private:
