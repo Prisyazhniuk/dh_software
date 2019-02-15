@@ -16,7 +16,7 @@ class main_window : public QMainWindow
 	Q_OBJECT
 
 public:
-	explicit main_window( fft_viewer_core*,
+    explicit main_window( dh::fft_viewer_core*,
 						  QWidget *parent = nullptr );
 	~main_window();
 
@@ -27,9 +27,9 @@ private slots:
 	void on_open_image_action_triggered();
 
 private:
-	fft_viewer_core* _core;
+    dh::fft_viewer_core* _core;
 	Ui::main_window* _ui;
 
     QGraphicsScene* _scene;
-    graphics_view* _graphics_view;
+    dh::graphics_view* _graphics_view;
 };

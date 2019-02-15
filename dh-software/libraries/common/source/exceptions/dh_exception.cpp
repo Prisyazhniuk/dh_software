@@ -6,65 +6,68 @@
 
 using namespace std;
 
-dh_exception::dh_exception( const exception_source& source )
-	: dh_exception( "", source )
-{}
-
-dh_exception::dh_exception( const string& message, const exception_source& source )
-	: _string_representation_initialized( false )
+namespace dh
 {
-	auto class_name = demangle_class_name( typeid( *this ).name() );
+    dh_exception::dh_exception( const exception_source& source )
+        : dh_exception( "", source )
+    {}
 
-	ostringstream s;
+    dh_exception::dh_exception( const string& message, const exception_source& source )
+        : _string_representation_initialized( false )
+    {
+        auto class_name = demangle_class_name( typeid( *this ).name() );
 
-	if( !message.empty() )
-		s << "Message: " << message << endl;
+        ostringstream s;
 
-	s << source.c_str() << endl;
+        if( !message.empty() )
+            s << "Message: " << message << endl;
 
-	_extended_message = s.str();
-}
+        s << source.c_str() << endl;
 
-dh_exception::dh_exception( const dh_exception* inner_exception, const exception_source& source )
-	: dh_exception( "", inner_exception, source )
-{}
+        _extended_message = s.str();
+    }
 
-dh_exception::dh_exception( const string& message,
-							const dh_exception* inner_exception,
-							const exception_source& source )
-	: _string_representation_initialized( false )
-{
-	auto class_name = demangle_class_name( typeid( *this ).name() );
+    dh_exception::dh_exception( const dh_exception* inner_exception, const exception_source& source )
+        : dh_exception( "", inner_exception, source )
+    {}
 
-	ostringstream s;
+    dh_exception::dh_exception( const string& message,
+                                const dh_exception* inner_exception,
+                                const exception_source& source )
+        : _string_representation_initialized( false )
+    {
+        auto class_name = demangle_class_name( typeid( *this ).name() );
 
-	if( !message.empty() )
-		s << "Message: " << message << endl;
+        ostringstream s;
 
-	s << source.c_str() << endl;
-	s << "Inner exception: " << inner_exception->c_str() << endl;
+        if( !message.empty() )
+            s << "Message: " << message << endl;
 
-	_extended_message = s.str();
-}
+        s << source.c_str() << endl;
+        s << "Inner exception: " << inner_exception->c_str() << endl;
 
-dh_exception::~dh_exception()
-{}
+        _extended_message = s.str();
+    }
 
-const char* dh_exception::c_str() const
-{
-	if( !_string_representation_initialized )
-	{
-		auto class_name = demangle_class_name( typeid( *this ).name() );
+    dh_exception::~dh_exception()
+    {}
 
-		ostringstream s;
+    const char* dh_exception::c_str() const
+    {
+        if( !_string_representation_initialized )
+        {
+            auto class_name = demangle_class_name( typeid( *this ).name() );
 
-		s << "Exception class: " << class_name << endl;
-		s << _extended_message << endl;
+            ostringstream s;
 
-		_string_representation = s.str();
+            s << "Exception class: " << class_name << endl;
+            s << _extended_message << endl;
 
-		_string_representation_initialized = true;
-	}
+            _string_representation = s.str();
 
-	return _string_representation.c_str();
+            _string_representation_initialized = true;
+        }
+
+        return _string_representation.c_str();
+    }
 }

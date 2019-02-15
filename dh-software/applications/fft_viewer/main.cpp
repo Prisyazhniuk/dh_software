@@ -6,6 +6,7 @@
 
 #include <string>
 
+using namespace dh;
 using namespace std;
 
 int main( int argc, char *argv[] )

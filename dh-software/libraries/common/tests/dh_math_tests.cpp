@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+using namespace dh;
 using namespace testing;
 
 TEST( dh_math_tests, next_power_of_2 )

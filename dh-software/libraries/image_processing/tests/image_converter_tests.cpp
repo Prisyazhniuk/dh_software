@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+using namespace dh;
 using namespace cv;
 using namespace testing;
 

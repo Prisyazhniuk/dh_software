@@ -7,25 +7,28 @@
 #include <atomic>
 #include <string>
 
-class fft_viewer_core : public QObject
+namespace dh
 {
-    Q_OBJECT
+    class fft_viewer_core : public QObject
+    {
+        Q_OBJECT
 
-public:
-	fft_viewer_core();
-	~fft_viewer_core();
+    public:
+        fft_viewer_core();
+        ~fft_viewer_core();
 
-    void run_processing( const std::string& image_path );
+        void run_processing( const std::string& image_path );
 
-signals:
-    void image_processed( const QPixmap& );
+    signals:
+        void image_processed( const QPixmap& );
 
 
-private:
-    void stop();
-    void processing_thread( const std::string& image_path );
+    private:
+        void stop();
+        void processing_thread( const std::string& image_path );
 
-private:
-	std::atomic_bool _shutdown_signal;
-	dh_thread _processing_thread;
-};
+    private:
+        std::atomic_bool _shutdown_signal;
+        dh_thread _processing_thread;
+    };
+}

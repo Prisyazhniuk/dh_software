@@ -4,9 +4,11 @@
 
 using std::string;
 
-class dh_string
+namespace dh
 {
-public:
-	static string fs( const char* format, ... );
-};
-
+    class dh_string
+    {
+    public:
+        static string fs( const char* format, ... );
+    };
+}

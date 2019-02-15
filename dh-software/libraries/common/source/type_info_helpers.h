@@ -2,4 +2,7 @@
 
 #include <string>
 
-std::string demangle_class_name( const char* mangled );
+namespace dh
+{
+    std::string demangle_class_name( const char* mangled );
+}

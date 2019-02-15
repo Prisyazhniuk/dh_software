@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+using namespace dh;
 using cv::Mat;
 using cv::Scalar;
 

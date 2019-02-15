@@ -8,6 +8,8 @@
 #include <QFileDialog>
 #include <QDir>
 
+using namespace dh;
+
 main_window::main_window( fft_viewer_core* core,
 						  QWidget *parent )
 	: QMainWindow( parent )

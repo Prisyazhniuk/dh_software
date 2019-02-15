@@ -6,27 +6,30 @@
 #include <opencv2/core.hpp>
 #include <ippcore.h>
 
-class dft
+namespace dh
 {
-public:
-    dft( int width, int height, int channels );
-    ~dft();
+    class dft
+    {
+    public:
+        dft( int width, int height, int channels );
+        ~dft();
 
-    void forward( const cv::Mat& src, cv::Mat& dst );
+        void forward( const cv::Mat& src, cv::Mat& dst );
 
-private:
-    const int _flags = IPP_FFT_DIV_INV_BY_N;
-    const IppHintAlgorithm _hint = ippAlgHintNone;
+    private:
+        const int _flags = IPP_FFT_DIV_INV_BY_N;
+        const IppHintAlgorithm _hint = ippAlgHintNone;
 
-    int _width;
-    int _height;
-    int _channels;
+        int _width;
+        int _height;
+        int _channels;
 
-    IppiDFTSpec_R_32f* _context;
-    uint8_t* _init_buffer;
-    uint8_t* _work_buffer;
+        IppiDFTSpec_R_32f* _context;
+        uint8_t* _init_buffer;
+        uint8_t* _work_buffer;
 
-    uint8_t* _repack_buffer;
+        uint8_t* _repack_buffer;
 
-    cv::Mat _coefficients;
-};
+        cv::Mat _coefficients;
+    };
+}

@@ -2,8 +2,11 @@
 
 #include "exceptions/image_processing_exception.h"
 
-class image_processing
+namespace dh
 {
-public:
-	static void initialize_ipp();
-};
+    class image_processing
+    {
+    public:
+        static void initialize_ipp();
+    };
+}

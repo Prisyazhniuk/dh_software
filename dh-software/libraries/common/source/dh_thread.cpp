@@ -1,25 +1,28 @@
 #include "dh_thread.h"
 
-dh_thread::dh_thread()
-{}
-
-dh_thread::dh_thread( dh_thread&& other )
+namespace dh
 {
-	_thread = std::move( other._thread );
-}
+    dh_thread::dh_thread()
+    {}
 
-void dh_thread::join()
-{
-	_thread.join();
-}
+    dh_thread::dh_thread( dh_thread&& other )
+    {
+        _thread = std::move( other._thread );
+    }
 
-bool dh_thread::joinable()
-{
-	return _thread.joinable();
-}
+    void dh_thread::join()
+    {
+        _thread.join();
+    }
 
-dh_thread& dh_thread::operator=( dh_thread&& other )
-{
-	_thread = std::move( other._thread );
-	return *this;
+    bool dh_thread::joinable()
+    {
+        return _thread.joinable();
+    }
+
+    dh_thread& dh_thread::operator=( dh_thread&& other )
+    {
+        _thread = std::move( other._thread );
+        return *this;
+    }
 }

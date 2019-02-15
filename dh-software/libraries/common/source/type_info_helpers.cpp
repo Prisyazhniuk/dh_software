@@ -6,14 +6,17 @@
 
 using namespace std;
 
-string demangle_class_name( const char* mangled )
+namespace dh
 {
-	int status = INT_MIN;
-	auto demangled = abi::__cxa_demangle( mangled, nullptr, nullptr, &status );
+    string demangle_class_name( const char* mangled )
+    {
+        int status = INT_MIN;
+        auto demangled = abi::__cxa_demangle( mangled, nullptr, nullptr, &status );
 
-	string result( status == 0 ? demangled : "" );
+        string result( status == 0 ? demangled : "" );
 
-	free( demangled );
+        free( demangled );
 
-	return result;
+        return result;
+    }
 }
