@@ -21,18 +21,27 @@ fft_viewer_core::fft_viewer_core()
 
 fft_viewer_core::~fft_viewer_core()
 {
-	_shutdown_signal = true;
-
-	if( _processing_thread.joinable() )
-		_processing_thread.join();
+    stop();
 }
 
-void fft_viewer_core::run( const string& image_path )
+void fft_viewer_core::run_processing( const string& image_path )
 {
+    stop();
+
     _processing_thread = dh_thread( "processing_thread",
                                     &fft_viewer_core::processing_thread,
                                     this,
                                     image_path );
+}
+
+void fft_viewer_core::stop()
+{
+    _shutdown_signal = true;
+
+    if( _processing_thread.joinable() )
+        _processing_thread.join();
+
+    _shutdown_signal = false;
 }
 
 void fft_viewer_core::processing_thread( const string& image_path )
