@@ -10,6 +10,8 @@ DhCppStaticLibrary {
         "dh_string.h",
         "dh_thread.cpp",
         "dh_thread.h",
+        "dh_timer.cpp",
+        "dh_timer.h",
         "exceptions/argument_exception.h",
         "exceptions/dh_exception.cpp",
         "exceptions/dh_exception.h",
