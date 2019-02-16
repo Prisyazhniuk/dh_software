@@ -2,7 +2,7 @@
 
 #include "dh_thread.h"
 
-#include <QPixmap>
+#include <QImage>
 
 #include <atomic>
 #include <string>
@@ -17,14 +17,13 @@ namespace dh
         fft_viewer_core();
         ~fft_viewer_core();
 
-        void run_processing( const std::string& image_path );
+        void run( const std::string& image_path );
+        void stop();
 
     signals:
-        void image_processed( const QPixmap& );
-
+        void image_processed( const QImage& );
 
     private:
-        void stop();
         void processing_thread( const std::string& image_path );
 
     private:

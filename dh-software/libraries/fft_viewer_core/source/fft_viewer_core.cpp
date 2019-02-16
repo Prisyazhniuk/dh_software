@@ -26,7 +26,7 @@ namespace dh
         stop();
     }
 
-    void fft_viewer_core::run_processing( const string& image_path )
+    void fft_viewer_core::run( const string& image_path )
     {
         stop();
 
@@ -94,14 +94,13 @@ namespace dh
 
             image_converter::convert_32f_8u( magnitudes_32f, magnitudes_8u );
 
+            // TODO
             // cvtColor( image_8u, image_8u, COLOR_BGR2RGB );
 
             auto magnitudes_q = QImage( magnitudes_8u.data, magnitudes_8u.cols, magnitudes_8u.rows,
                                         static_cast<int>( magnitudes_8u.step ), QImage::Format_Grayscale8 );
 
-            auto pixmap = QPixmap::fromImage( magnitudes_q );
-
-            emit image_processed( pixmap );
+            emit image_processed( magnitudes_q.copy() );
         }
     }
 }

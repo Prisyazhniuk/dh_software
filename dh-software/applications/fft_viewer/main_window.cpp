@@ -26,6 +26,7 @@ main_window::main_window( fft_viewer_core* core,
     _ui->splitter->setCollapsible( 1, false );
 
     _scene = new QGraphicsScene( this );
+    _scene_item = _scene->addPixmap( QPixmap() );
 
     _graphics_view = new graphics_view( this );
     _graphics_view->set_scene( _scene );
@@ -36,14 +37,18 @@ main_window::main_window( fft_viewer_core* core,
 
 main_window::~main_window()
 {
+    _core->stop();
     delete _ui;
 }
 
-void main_window::show_image( const QPixmap& pixmap )
+void main_window::show_image( const QImage& image )
 {
-    _scene->clear();
-    _scene->setSceneRect( pixmap.rect() );
-    _scene->addPixmap( pixmap );
+    auto pixmap = QPixmap::fromImage( image );
+
+    if( _scene_item->pixmap().rect() != pixmap.rect() )
+        _scene->setSceneRect( pixmap.rect() );
+
+    _scene_item->setPixmap( pixmap );
 }
 
 void main_window::on_open_image_action_triggered()
@@ -53,5 +58,5 @@ void main_window::on_open_image_action_triggered()
 												   QDir::currentPath(),
 												   "Изображения (*.bmp *.png)" );
 
-    _core->run_processing( file_name.toStdString() );
+    _core->run( file_name.toStdString() );
 }

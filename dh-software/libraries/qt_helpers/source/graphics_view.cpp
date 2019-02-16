@@ -39,9 +39,6 @@ namespace dh
         zoom_in_button->setIconSize( icon_size );
 
         auto zoom_reset_button = new QToolButton();
-        zoom_reset_button->setAutoRepeat( true );
-        zoom_reset_button->setAutoRepeatInterval( repeat_interval );
-        zoom_reset_button->setAutoRepeatDelay( 0 );
         zoom_reset_button->setIcon( QPixmap(":/icons/zoom_reset.png") );
         zoom_reset_button->setIconSize( icon_size );
 

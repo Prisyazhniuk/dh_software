@@ -5,23 +5,24 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
 
 namespace Ui
 {
 	class main_window;
 }
 
-class main_window : public QMainWindow
+class main_window: public QMainWindow
 {
 	Q_OBJECT
 
 public:
     explicit main_window( dh::fft_viewer_core*,
 						  QWidget *parent = nullptr );
-	~main_window();
+    virtual ~main_window() override;
 
 public slots:
-    void show_image( const QPixmap& );
+    void show_image( const QImage& );
 
 private slots:
 	void on_open_image_action_triggered();
@@ -31,5 +32,7 @@ private:
 	Ui::main_window* _ui;
 
     QGraphicsScene* _scene;
+    QGraphicsPixmapItem* _scene_item;
+
     dh::graphics_view* _graphics_view;
 };
