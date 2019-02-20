@@ -7,6 +7,7 @@
 #include <QScreen>
 #include <QFileDialog>
 #include <QDir>
+#include <QMimeDatabase>
 
 using namespace dh;
 
@@ -52,11 +53,41 @@ void main_window::show_image( const QImage& image )
 }
 
 void main_window::on_open_image_action_triggered()
-{
-	auto file_name = QFileDialog::getOpenFileName( this,
-												   "Открыть изображение",
-												   QDir::currentPath(),
-												   "Изображения (*.bmp *.png)" );
 
-    _core->run( file_name.toStdString() );
+{
+    QFileDialog dialog( this, "Открыть изображение" );
+
+    dialog.setDirectory( QDir::currentPath() );
+
+    QStringList type_filters;
+    type_filters.push_back( "image/png" );
+    type_filters.push_back( "image/jpeg" );
+    type_filters.push_back( "image/bmp" );
+
+    QMimeDatabase mime_database;
+    QStringList all_images_types;
+    for( auto& filter: type_filters )
+    {
+        auto mime_type = mime_database.mimeTypeForName( filter );
+        if( mime_type.isValid() )
+            all_images_types.append( mime_type.globPatterns() );
+    }
+
+    auto all_images_filter = QString( "Все файлы изображений (%1)" ).arg( all_images_types.join(' ') );
+    auto all_files_filter = QString( "Все файлы (*)" );
+
+    dialog.setMimeTypeFilters( type_filters );
+
+    auto filters = dialog.nameFilters();
+    filters.append( all_images_filter );
+    filters.append( all_files_filter );
+    dialog.setNameFilters(filters);
+
+    dialog.selectNameFilter(all_images_filter);
+
+    if( dialog.exec() == QDialog::Accepted )
+    {
+        auto file_name = dialog.selectedFiles().first();
+        _core->run( file_name.toStdString() );
+    }
 }
