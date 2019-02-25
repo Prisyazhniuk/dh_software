@@ -12,15 +12,15 @@
 using namespace dh;
 
 main_window::main_window( fft_viewer_core* core,
-						  QWidget *parent )
-	: QMainWindow( parent )
-	, _core( core )
-	, _ui( new Ui::main_window )
+                          QWidget *parent )
+    : QMainWindow( parent )
+    , _core( core )
+    , _ui( new Ui::main_window )
 {
-	if( !core )
-		throw argument_exception( "core is null", get_exception_source() );
+    if( !core )
+        throw argument_exception( "core is null", get_exception_source() );
 
-	_ui->setupUi( this );
+    _ui->setupUi( this );
 
     _ui->splitter->setStretchFactor( 0, 1 );
     _ui->splitter->setStretchFactor( 1, 3 );
@@ -42,7 +42,7 @@ main_window::~main_window()
     delete _ui;
 }
 
-void main_window::show_image( const QImage& image )
+void main_window::image_processed( const QImage& image )
 {
     auto pixmap = QPixmap::fromImage( image );
 
@@ -52,8 +52,12 @@ void main_window::show_image( const QImage& image )
     _scene_item->setPixmap( pixmap );
 }
 
-void main_window::on_open_image_action_triggered()
+void main_window::statistics_ready( const processing_statistics& s )
+{
+    // float fps = s.frames_processed * 1000*1000.0f / s.period_us;
+}
 
+void main_window::on_open_image_action_triggered()
 {
     QFileDialog dialog( this, "Открыть изображение" );
 

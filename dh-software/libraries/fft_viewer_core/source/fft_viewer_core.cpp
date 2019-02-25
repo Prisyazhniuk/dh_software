@@ -1,6 +1,7 @@
 #include "fft_viewer_core.h"
 #include "image_converter.h"
 #include "dft.h"
+#include "dh_timer.h"
 
 // TODO
 #include <QDebug>
@@ -19,6 +20,7 @@ namespace dh
 {
     fft_viewer_core::fft_viewer_core()
         : _shutdown_signal( false )
+        , _statistics( {} )
     {}
 
     fft_viewer_core::~fft_viewer_core()
@@ -64,8 +66,13 @@ namespace dh
 
         dft dft( cols, rows, image_8u.channels() );
 
+
+        auto statistics_start_time = dh_timer::now_us();
+
         while( !_shutdown_signal )
         {
+            auto frame_processing_start_time = dh_timer::now_us();
+
             image_converter::convert_8u_32f( image_8u, image_32f );
 
             dft.forward( image_32f, magnitudes_32f );
@@ -101,6 +108,21 @@ namespace dh
                                         static_cast<int>( magnitudes_8u.step ), QImage::Format_Grayscale8 );
 
             emit image_processed( magnitudes_q.copy() );
+
+            auto frame_processing_time = dh_timer::now_us() - frame_processing_start_time;
+            if( frame_processing_time < _min_processing_time_us )
+                dh_timer::wait_for_us( _min_processing_time_us - frame_processing_time );
+
+            _statistics.frames_processed++;
+            _statistics.period_us = dh_timer::now_us() - statistics_start_time;
+
+            if( _statistics.period_us > _statistics_collection_period_us )
+            {
+                emit statistics_ready( _statistics );
+
+                _statistics = {};
+                statistics_start_time = dh_timer::now_us();
+            }
         }
     }
 }

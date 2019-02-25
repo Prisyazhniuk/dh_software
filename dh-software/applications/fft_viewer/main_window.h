@@ -22,7 +22,8 @@ public:
     virtual ~main_window() override;
 
 public slots:
-    void show_image( const QImage& );
+    void image_processed( const QImage& );
+    void statistics_ready( const dh::processing_statistics& );
 
 private slots:
 	void on_open_image_action_triggered();

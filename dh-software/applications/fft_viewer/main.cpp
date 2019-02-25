@@ -23,9 +23,10 @@ int main( int argc, char *argv[] )
         main_window main_window( &core );
         main_window.show();
 
-        QObject::connect( &core, &fft_viewer_core::image_processed,
-                          &main_window, &main_window::show_image );
+        qRegisterMetaType<processing_statistics>("processing_statistics");
 
+        QObject::connect( &core, &fft_viewer_core::image_processed, &main_window, &main_window::image_processed );
+        QObject::connect( &core, &fft_viewer_core::statistics_ready, &main_window, &main_window::statistics_ready );
 
 		return application.exec();
 	}
