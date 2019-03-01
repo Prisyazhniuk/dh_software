@@ -33,6 +33,15 @@ main_window::main_window( fft_viewer_core* core,
     _graphics_view->set_scene( _scene );
     _ui->graphics_view_layout->addWidget( _graphics_view );
 
+    _processing_statistics_model = new processing_statisctics_model( this );
+    _ui->statistics_view->setModel( _processing_statistics_model );
+    _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
+    _ui->statistics_view->horizontalHeader()->hide();
+    _ui->statistics_view->verticalHeader()->hide();
+
+    connect( this, &main_window::update_statistics_model,
+             _processing_statistics_model, &processing_statisctics_model::update_statistics );
+
     showMaximized();
 }
 
@@ -54,7 +63,7 @@ void main_window::image_processed( const QImage& image )
 
 void main_window::statistics_ready( const processing_statistics& s )
 {
-    // float fps = s.frames_processed * 1000*1000.0f / s.period_us;
+    emit update_statistics_model( s );
 }
 
 void main_window::on_open_image_action_triggered()

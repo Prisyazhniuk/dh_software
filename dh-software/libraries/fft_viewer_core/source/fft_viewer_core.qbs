@@ -19,6 +19,8 @@ DhCppStaticLibrary {
     files: [
         "fft_viewer_core.cpp",
         "fft_viewer_core.h",
+        "processing_statisctics_model.cpp",
+        "processing_statisctics_model.h",
         "processing_statistics.h",
     ]   
 }

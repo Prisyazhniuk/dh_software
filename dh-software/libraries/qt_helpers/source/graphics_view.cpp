@@ -23,8 +23,8 @@ namespace dh
         _graphics_view->setInteractive( true );
         _graphics_view->setDragMode( QGraphicsView::ScrollHandDrag );
 
-        QObject::connect( _graphics_view, &graphics_view_wheel_scroll::zoom_in, this, &graphics_view::zoom_in );
-        QObject::connect( _graphics_view, &graphics_view_wheel_scroll::zoom_out, this, &graphics_view::zoom_out );
+        connect( _graphics_view, &graphics_view_wheel_scroll::zoom_in, this, &graphics_view::zoom_in );
+        connect( _graphics_view, &graphics_view_wheel_scroll::zoom_out, this, &graphics_view::zoom_out );
 
         int size = style()->pixelMetric( QStyle::PM_ToolBarIconSize );
         QSize icon_size( size, size );
