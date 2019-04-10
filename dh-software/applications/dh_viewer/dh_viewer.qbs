@@ -1,9 +1,9 @@
 import qbs
 
 DhCppApplication {
-    name: "fft_viewer"
+    name: "dh_viewer"
 
-    Depends { name: "fft_viewer_core" }
+    Depends { name: "dh_viewer_core" }
     Depends { name: "qt_helpers" }
 
     Depends {

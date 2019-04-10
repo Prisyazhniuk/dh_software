@@ -1,6 +1,6 @@
 #pragma once
 
-#include "processing_statistics.h"
+#include "fft_processing_statistics.h"
 #include "dh_thread.h"
 
 #include <QImage>
@@ -10,20 +10,20 @@
 
 namespace dh
 {
-    class fft_viewer_core : public QObject
+    class fft_processor : public QObject
     {
         Q_OBJECT
 
     public:
-        fft_viewer_core();
-        ~fft_viewer_core();
+        fft_processor();
+        ~fft_processor();
 
         void run( const std::string& image_path );
         void stop();
 
     signals:
         void image_processed( const QImage& );
-        void statistics_ready( const processing_statistics& );
+        void statistics_ready( const fft_processing_statistics& );
 
     private:
         void processing_thread( const std::string& image_path );
@@ -37,6 +37,6 @@ namespace dh
         std::atomic_bool _shutdown_signal;
         dh_thread _processing_thread;
 
-        processing_statistics _statistics;
+        fft_processing_statistics _statistics;
     };
 }

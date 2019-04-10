@@ -11,14 +11,14 @@
 
 using namespace dh;
 
-main_window::main_window( fft_viewer_core* core,
+main_window::main_window( fft_processor* fft_processor,
                           QWidget *parent )
     : QMainWindow( parent )
-    , _core( core )
+    , _fft_processor( fft_processor )
     , _ui( new Ui::main_window )
 {
-    if( !core )
-        throw argument_exception( "core is null", get_exception_source() );
+    if( !fft_processor )
+        throw argument_exception( "fft_processor is null", get_exception_source() );
 
     _ui->setupUi( this );
 
@@ -47,7 +47,7 @@ main_window::main_window( fft_viewer_core* core,
 
 main_window::~main_window()
 {
-    _core->stop();
+    _fft_processor->stop();
     delete _ui;
 }
 
@@ -61,7 +61,7 @@ void main_window::image_processed( const QImage& image )
     _scene_item->setPixmap( pixmap );
 }
 
-void main_window::statistics_ready( const processing_statistics& s )
+void main_window::statistics_ready( const fft_processing_statistics& s )
 {
     emit update_statistics_model( s );
 }
@@ -101,6 +101,6 @@ void main_window::on_open_image_action_triggered()
     if( dialog.exec() == QDialog::Accepted )
     {
         auto file_name = dialog.selectedFiles().first();
-        _core->run( file_name.toStdString() );
+        _fft_processor->run( file_name.toStdString() );
     }
 }

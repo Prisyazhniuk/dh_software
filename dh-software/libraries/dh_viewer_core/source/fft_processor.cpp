@@ -1,4 +1,4 @@
-#include "fft_viewer_core.h"
+#include "fft_processor.h"
 #include "image_converter.h"
 #include "dft.h"
 #include "spectrum_shifter.h"
@@ -19,27 +19,27 @@ using namespace std;
 
 namespace dh
 {
-    fft_viewer_core::fft_viewer_core()
+    fft_processor::fft_processor()
         : _shutdown_signal( false )
         , _statistics( {} )
     {}
 
-    fft_viewer_core::~fft_viewer_core()
+    fft_processor::~fft_processor()
     {
         stop();
     }
 
-    void fft_viewer_core::run( const string& image_path )
+    void fft_processor::run( const string& image_path )
     {
         stop();
 
         _processing_thread = dh_thread( "processing_thread",
-                                        &fft_viewer_core::processing_thread,
+                                        &fft_processor::processing_thread,
                                         this,
                                         image_path );
     }
 
-    void fft_viewer_core::stop()
+    void fft_processor::stop()
     {
         _shutdown_signal = true;
 
@@ -49,7 +49,7 @@ namespace dh
         _shutdown_signal = false;
     }
 
-    void fft_viewer_core::processing_thread( const string& image_path )
+    void fft_processor::processing_thread( const string& image_path )
     {
         auto image_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
         if( image_8u.empty() )

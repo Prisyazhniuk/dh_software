@@ -4,7 +4,7 @@ namespace dh
 {
     processing_statisctics_model::processing_statisctics_model( QObject* parent )
         : QAbstractTableModel ( parent )
-        , _statistics( {} )
+        , _fft_processing_statistics( {} )
     {}
 
     int processing_statisctics_model::rowCount( const QModelIndex& ) const
@@ -44,9 +44,9 @@ namespace dh
         }
     }
 
-    void processing_statisctics_model::update_statistics( const processing_statistics& s )
+    void processing_statisctics_model::update_statistics( const fft_processing_statistics& s )
     {
-        _statistics = s;
+        _fft_processing_statistics = s;
 
         emit dataChanged( createIndex( 0, 0 ),
                           createIndex( _rows-1, _cols-1 ),
@@ -55,9 +55,9 @@ namespace dh
 
     double processing_statisctics_model::fps() const
     {
-        if( _statistics.period_us == 0 )
+        if( _fft_processing_statistics.period_us == 0 )
             return 0;
 
-        return _statistics.frames_processed * 1000 * 1000.0 / _statistics.period_us;
+        return _fft_processing_statistics.frames_processed * 1000 * 1000.0 / _fft_processing_statistics.period_us;
     }
 }

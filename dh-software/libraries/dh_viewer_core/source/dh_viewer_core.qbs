@@ -1,7 +1,7 @@
 import qbs
 
 DhCppStaticLibrary {
-    name: "fft_viewer_core"
+    name: "dh_viewer_core"
 
     Depends { name: "image_processing" }
     Depends { name: "common" }
@@ -17,10 +17,10 @@ DhCppStaticLibrary {
     }
 
     files: [
-        "fft_viewer_core.cpp",
-        "fft_viewer_core.h",
+        "fft_processing_statistics.h",
+        "fft_processor.cpp",
+        "fft_processor.h",
         "processing_statisctics_model.cpp",
         "processing_statisctics_model.h",
-        "processing_statistics.h",
     ]   
 }

@@ -4,7 +4,7 @@
 
 namespace dh
 {
-    struct processing_statistics
+    struct fft_processing_statistics
     {
         uint64_t period_us;
 

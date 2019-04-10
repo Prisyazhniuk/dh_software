@@ -1,6 +1,6 @@
 #pragma once
 
-#include "processing_statistics.h"
+#include "fft_processing_statistics.h"
 
 #include <QAbstractTableModel>
 
@@ -17,7 +17,7 @@ namespace dh
         virtual QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 
     public slots:
-        void update_statistics( const processing_statistics& );
+        void update_statistics( const fft_processing_statistics& );
 
     private:
         double fps() const;
@@ -26,6 +26,6 @@ namespace dh
         static const int _rows = 1;
         static const int _cols = 2;
 
-        processing_statistics _statistics;
+        fft_processing_statistics _fft_processing_statistics;
     };
 }

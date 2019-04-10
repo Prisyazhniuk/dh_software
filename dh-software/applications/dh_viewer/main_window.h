@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fft_viewer_core.h"
+#include "fft_processor.h"
 #include "graphics_view.h"
 #include "processing_statisctics_model.h"
 
@@ -18,22 +18,22 @@ class main_window: public QMainWindow
 	Q_OBJECT
 
 public:
-    explicit main_window( dh::fft_viewer_core*,
+    explicit main_window( dh::fft_processor*,
 						  QWidget *parent = nullptr );
     virtual ~main_window() override;
 
 signals:
-    void update_statistics_model( const dh::processing_statistics& );
+    void update_statistics_model( const dh::fft_processing_statistics& );
 
 public slots:
     void image_processed( const QImage& );
-    void statistics_ready( const dh::processing_statistics& );
+    void statistics_ready( const dh::fft_processing_statistics& );
 
 private slots:
 	void on_open_image_action_triggered();
 
 private:
-    dh::fft_viewer_core* _core;
+    dh::fft_processor* _fft_processor;
 	Ui::main_window* _ui;
 
     QGraphicsScene* _scene;

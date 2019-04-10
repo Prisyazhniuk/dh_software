@@ -1,5 +1,5 @@
 #include "main_window.h"
-#include "fft_viewer_core.h"
+#include "fft_processor.h"
 #include "image_processing.h"
 
 #include <QApplication>
@@ -19,14 +19,14 @@ int main( int argc, char *argv[] )
 
 		image_processing::initialize_ipp();
 
-		fft_viewer_core core;
-        main_window main_window( &core );
+        fft_processor fft_processor;
+        main_window main_window( &fft_processor );
         main_window.show();
 
-        qRegisterMetaType<processing_statistics>("processing_statistics");
+        qRegisterMetaType<fft_processing_statistics>("fft_processing_statistics");
 
-        QObject::connect( &core, &fft_viewer_core::image_processed, &main_window, &main_window::image_processed );
-        QObject::connect( &core, &fft_viewer_core::statistics_ready, &main_window, &main_window::statistics_ready );
+        QObject::connect( &fft_processor, &fft_processor::image_processed, &main_window, &main_window::image_processed );
+        QObject::connect( &fft_processor, &fft_processor::statistics_ready, &main_window, &main_window::statistics_ready );
 
 		return application.exec();
 	}
