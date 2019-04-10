@@ -33,7 +33,7 @@ namespace dh
     {
         stop();
 
-        _processing_thread = dh_thread( "processing_thread",
+        _processing_thread = dh_thread( "fft_processor thread",
                                         &fft_processor::processing_thread,
                                         this,
                                         image_path );

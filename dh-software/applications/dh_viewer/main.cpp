@@ -1,5 +1,6 @@
 #include "main_window.h"
 #include "fft_processor.h"
+#include "blob_detector.h"
 #include "image_processing.h"
 
 #include <QApplication>
@@ -20,13 +21,17 @@ int main( int argc, char *argv[] )
 		image_processing::initialize_ipp();
 
         fft_processor fft_processor;
-        main_window main_window( &fft_processor );
+        blob_detector blob_detector;
+
+        main_window main_window( &fft_processor, &blob_detector );
         main_window.show();
 
         qRegisterMetaType<fft_processing_statistics>("fft_processing_statistics");
 
         QObject::connect( &fft_processor, &fft_processor::image_processed, &main_window, &main_window::image_processed );
         QObject::connect( &fft_processor, &fft_processor::statistics_ready, &main_window, &main_window::statistics_ready );
+
+        QObject::connect( &blob_detector, &blob_detector::image_processed, &main_window, &main_window::image_processed );
 
 		return application.exec();
 	}

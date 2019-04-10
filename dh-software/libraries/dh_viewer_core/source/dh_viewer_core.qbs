@@ -17,6 +17,9 @@ DhCppStaticLibrary {
     }
 
     files: [
+        "blob_detection_statistics.h",
+        "blob_detector.cpp",
+        "blob_detector.h",
         "fft_processing_statistics.h",
         "fft_processor.cpp",
         "fft_processor.h",

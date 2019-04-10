@@ -12,13 +12,18 @@
 using namespace dh;
 
 main_window::main_window( fft_processor* fft_processor,
+                          blob_detector* blob_detector,
                           QWidget *parent )
     : QMainWindow( parent )
     , _fft_processor( fft_processor )
+    , _blob_detector( blob_detector )
     , _ui( new Ui::main_window )
 {
     if( !fft_processor )
         throw argument_exception( "fft_processor is null", get_exception_source() );
+
+    if( !blob_detector )
+        throw argument_exception( "blob_detector is null", get_exception_source() );
 
     _ui->setupUi( this );
 
@@ -48,6 +53,7 @@ main_window::main_window( fft_processor* fft_processor,
 main_window::~main_window()
 {
     _fft_processor->stop();
+    _blob_detector->stop();
     delete _ui;
 }
 
@@ -101,6 +107,7 @@ void main_window::on_open_image_action_triggered()
     if( dialog.exec() == QDialog::Accepted )
     {
         auto file_name = dialog.selectedFiles().first();
-        _fft_processor->run( file_name.toStdString() );
+        //_fft_processor->run( file_name.toStdString() );
+        _blob_detector->run( file_name.toStdString() );
     }
 }

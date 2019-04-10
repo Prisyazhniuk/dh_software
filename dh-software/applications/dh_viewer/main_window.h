@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fft_processor.h"
+#include "blob_detector.h"
 #include "graphics_view.h"
 #include "processing_statisctics_model.h"
 
@@ -19,6 +20,7 @@ class main_window: public QMainWindow
 
 public:
     explicit main_window( dh::fft_processor*,
+                          dh::blob_detector*,
 						  QWidget *parent = nullptr );
     virtual ~main_window() override;
 
@@ -34,6 +36,8 @@ private slots:
 
 private:
     dh::fft_processor* _fft_processor;
+    dh::blob_detector* _blob_detector;
+
 	Ui::main_window* _ui;
 
     QGraphicsScene* _scene;

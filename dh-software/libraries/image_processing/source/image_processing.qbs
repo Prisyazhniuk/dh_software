@@ -13,7 +13,9 @@ DhCppStaticLibrary {
         "opencv_world400",
         "ippcore",
         "ippi",
-        "ipps"
+        "ipps",
+        "ippvm",
+        "ippcv",
     ]
 
     files: [
@@ -21,6 +23,8 @@ DhCppStaticLibrary {
         "dft.h",
         "fft.cpp",
         "fft.h",
+        "gauss_filter.cpp",
+        "gauss_filter.h",
         "image_converter.cpp",
         "image_converter.h",
         "image_processing.cpp",
@@ -38,6 +42,8 @@ DhCppStaticLibrary {
             project.ipp_bin_path.concat("/ippcore.dll"),
             project.ipp_bin_path.concat("/ippi*.dll"),
             project.ipp_bin_path.concat("/ipps*.dll"),
+            project.ipp_bin_path.concat("/ippvm*.dll"),
+            project.ipp_bin_path.concat("/ippcv*.dll"),
         ]
     }
 }
