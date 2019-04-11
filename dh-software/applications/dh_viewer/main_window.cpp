@@ -44,8 +44,11 @@ main_window::main_window( fft_processor* fft_processor,
     _ui->statistics_view->horizontalHeader()->hide();
     _ui->statistics_view->verticalHeader()->hide();
 
-    connect( this, &main_window::update_statistics_model,
-             _processing_statistics_model, &processing_statisctics_model::update_statistics );
+    connect( this, qOverload<const fft_processing_statistics&>( &main_window::update_statistics_model ),
+             _processing_statistics_model, qOverload<const fft_processing_statistics&>( &processing_statisctics_model::update_statistics ) );
+
+    connect( this, qOverload<const blob_detection_statistics&>( &main_window::update_statistics_model ),
+             _processing_statistics_model, qOverload<const blob_detection_statistics&>( &processing_statisctics_model::update_statistics ) );
 
     showMaximized();
 }
@@ -68,6 +71,11 @@ void main_window::image_processed( const QImage& image )
 }
 
 void main_window::statistics_ready( const fft_processing_statistics& s )
+{
+    emit update_statistics_model( s );
+}
+
+void main_window::statistics_ready( const blob_detection_statistics& s )
 {
     emit update_statistics_model( s );
 }

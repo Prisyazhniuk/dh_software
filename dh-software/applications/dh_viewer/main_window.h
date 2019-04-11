@@ -26,10 +26,12 @@ public:
 
 signals:
     void update_statistics_model( const dh::fft_processing_statistics& );
+    void update_statistics_model( const dh::blob_detection_statistics& );
 
 public slots:
     void image_processed( const QImage& );
     void statistics_ready( const dh::fft_processing_statistics& );
+    void statistics_ready( const dh::blob_detection_statistics& );
 
 private slots:
 	void on_open_image_action_triggered();

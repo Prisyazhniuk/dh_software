@@ -27,11 +27,15 @@ int main( int argc, char *argv[] )
         main_window.show();
 
         qRegisterMetaType<fft_processing_statistics>("fft_processing_statistics");
+        qRegisterMetaType<blob_detection_statistics>("blob_detection_statistics");
 
         QObject::connect( &fft_processor, &fft_processor::image_processed, &main_window, &main_window::image_processed );
-        QObject::connect( &fft_processor, &fft_processor::statistics_ready, &main_window, &main_window::statistics_ready );
+        QObject::connect( &fft_processor, qOverload<const fft_processing_statistics&>( &fft_processor::statistics_ready ),
+                          &main_window, qOverload<const fft_processing_statistics&>( &main_window::statistics_ready ) );
 
         QObject::connect( &blob_detector, &blob_detector::image_processed, &main_window, &main_window::image_processed );
+        QObject::connect( &blob_detector, qOverload<const blob_detection_statistics&>( &blob_detector::statistics_ready ),
+                          &main_window, qOverload<const blob_detection_statistics&>( &main_window::statistics_ready ) );
 
 		return application.exec();
 	}

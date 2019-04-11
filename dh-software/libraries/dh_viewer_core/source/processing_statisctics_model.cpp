@@ -5,6 +5,7 @@ namespace dh
     processing_statisctics_model::processing_statisctics_model( QObject* parent )
         : QAbstractTableModel ( parent )
         , _fft_processing_statistics( {} )
+        , _blob_detection_statistics( {} )
     {}
 
     int processing_statisctics_model::rowCount( const QModelIndex& ) const
@@ -33,10 +34,36 @@ namespace dh
 
         if( role == Qt::DisplayRole )
         {
-            if( col == 0 )
-                return QString( "Fps" );
-            else
-                return QString::number( fps(), 'f', 1 );
+            auto& s = _blob_detection_statistics;
+
+            if( row == 0 )
+                return col == 0 ? QString( "Время обработки (мс)" ) :
+                                  QString::number( s.time_us/1000.0, 'f', 1 );
+
+            if( row == 1 )
+            {
+                if( s.blobs_count )
+                    return col == 0 ? QString( "Пучок 1" ) :
+                                      QString::number( s.blobs[0].center_x ) + ", " + QString::number( s.blobs[0].center_y );
+                else
+                    return QVariant();
+            }
+
+            if( row == 2 )
+            {
+                if( s.blobs_count > 1 )
+                    return col == 0 ? QString( "Пучок 2" ) :
+                                      QString::number( s.blobs[1].center_x ) + ", " + QString::number( s.blobs[1].center_y );
+                else
+                    return QVariant();
+            }
+
+            return QVariant();
+
+            //if( col == 0 )
+            //    return QString( "Fps" );
+            //else
+            //    return QString::number( fps(), 'f', 1 );
         }
         else
         {
@@ -47,6 +74,15 @@ namespace dh
     void processing_statisctics_model::update_statistics( const fft_processing_statistics& s )
     {
         _fft_processing_statistics = s;
+
+        emit dataChanged( createIndex( 0, 0 ),
+                          createIndex( _rows-1, _cols-1 ),
+                          { Qt::DisplayRole } );
+    }
+
+    void processing_statisctics_model::update_statistics( const blob_detection_statistics& s )
+    {
+        _blob_detection_statistics = s;
 
         emit dataChanged( createIndex( 0, 0 ),
                           createIndex( _rows-1, _cols-1 ),

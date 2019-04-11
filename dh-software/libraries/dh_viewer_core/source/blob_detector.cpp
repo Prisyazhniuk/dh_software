@@ -55,6 +55,8 @@ namespace dh
             return;
         }
 
+        auto start_time = dh_timer::now_us();
+
         auto rows = image_8u.rows;
         auto cols = image_8u.cols;
 
@@ -62,8 +64,6 @@ namespace dh
         auto filtered_32f = Mat( rows, cols, CV_32FC1 );
         auto filtered_8u = Mat( rows, cols, CV_8UC1 );
         auto blobs_8u = Mat( rows, cols, CV_8UC1 );
-
-        //auto statistics_start_time = dh_timer::now_us();
 
         image_converter::convert_8u_32f( image_8u, image_32f );
 
@@ -89,10 +89,22 @@ namespace dh
         auto blobs_q = QImage( blobs_8u_c3.data, blobs_8u_c3.cols, blobs_8u_c3.rows,
                                static_cast<int>( blobs_8u_c3.step ), QImage::Format_RGB888 );
 
+        blob_detection_statistics statistics;
+
         if( blobs_count < 3 )
         {
+            statistics.blobs_count = 0;
+
             for( size_t i = 0; i < blobs_count; i++ )
+            {
                 mark_blob_center( blobs_q, blobs[i] );
+
+                if( i < statistics.max_blobs_count )
+                {
+                    statistics.blobs[i] = blobs[ i ];
+                    statistics.blobs_count++;
+                }
+            }
         }
         else
         {
@@ -101,12 +113,19 @@ namespace dh
 
             mark_blob_center( blobs_q, b1 );
             mark_blob_center( blobs_q, b2 );
+
+            if( statistics.max_blobs_count >= 2 )
+            {
+                statistics.blobs_count = 2;
+                statistics.blobs[0] = b1;
+                statistics.blobs[1] = b2;
+            }
         }
 
         emit image_processed( blobs_q.copy() );
 
-        // _statistics.period_us = dh_timer::now_us() - statistics_start_time;
-        // emit statistics_ready( _statistics );
+        statistics.time_us = dh_timer::now_us() - start_time;
+        emit statistics_ready( statistics );
     }
 
     void blob_detector::find_two_largest_blobs( unique_ptr<blob[]> blobs, size_t blobs_count, blob& b1, blob& b2 )
