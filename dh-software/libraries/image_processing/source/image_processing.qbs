@@ -31,6 +31,8 @@ DhCppStaticLibrary {
         "image_converter.h",
         "image_processing.cpp",
         "image_processing.h",
+        "label_marker.cpp",
+        "label_marker.h",
         "spectrum_shifter.cpp",
         "spectrum_shifter.h",
     ]
