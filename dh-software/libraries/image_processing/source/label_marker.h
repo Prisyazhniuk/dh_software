@@ -13,7 +13,7 @@ namespace dh
         label_marker( int width, int height, int channels );
         ~label_marker();
 
-        int mark( const cv::Mat& );
+        size_t mark( const cv::Mat& );
 
     private:
         uint8_t* _buffer;

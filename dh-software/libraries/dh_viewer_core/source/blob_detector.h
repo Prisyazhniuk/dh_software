@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blob_detection_statistics.h"
+#include "blob.h"
 #include "dh_thread.h"
 
 #include <QImage>
@@ -26,6 +27,7 @@ namespace dh
 
     private:
         void processing_thread( const std::string& image_path );
+        void find_two_largest_blobs( std::shared_ptr<blob[]> blobs, size_t blobs_count, blob&, blob& );
 
     private:
         dh_thread _processing_thread;

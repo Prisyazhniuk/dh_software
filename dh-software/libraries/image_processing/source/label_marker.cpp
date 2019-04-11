@@ -42,7 +42,7 @@ namespace dh
         }
     }
 
-    int label_marker::mark( const cv::Mat& m )
+    size_t label_marker::mark( const cv::Mat& m )
     {
         // TODO
         // some checks like fft
@@ -55,6 +55,6 @@ namespace dh
         if( status != ippStsNoErr )
             throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
 
-        return count;
+        return size_t( count );
     }
 }

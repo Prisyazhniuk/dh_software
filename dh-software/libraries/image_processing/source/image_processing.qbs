@@ -21,6 +21,9 @@ DhCppStaticLibrary {
     files: [
         "binarizer.cpp",
         "binarizer.h",
+        "blob.h",
+        "blob_calculator.cpp",
+        "blob_calculator.h",
         "dft.cpp",
         "dft.h",
         "fft.cpp",

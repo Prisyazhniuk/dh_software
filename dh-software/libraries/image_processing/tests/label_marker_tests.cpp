@@ -38,7 +38,7 @@ TEST( label_marker_tests, works )
     label_marker marker( cols, rows, 1 );
     auto count = marker.mark( image_8u );
 
-    EXPECT_EQ( 3, count );
+    EXPECT_EQ( 3u, count );
 
     auto expected_image_8u = Mat( rows, cols, CV_8UC1, static_cast<void*>( expected_data ) );
 
