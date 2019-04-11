@@ -27,7 +27,8 @@ namespace dh
 
     private:
         void processing_thread( const std::string& image_path );
-        void find_two_largest_blobs( std::shared_ptr<blob[]> blobs, size_t blobs_count, blob&, blob& );
+        void find_two_largest_blobs( std::unique_ptr<blob[]> blobs, size_t blobs_count, blob&, blob& );
+        void mark_blob_center( QImage&, const blob& );
 
     private:
         dh_thread _processing_thread;

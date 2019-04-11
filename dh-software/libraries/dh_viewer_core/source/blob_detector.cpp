@@ -15,6 +15,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include <QPainter>
+#include <QPen>
+
 #include <iostream>
 
 using namespace cv;
@@ -86,15 +89,19 @@ namespace dh
         auto blobs_q = QImage( blobs_8u_c3.data, blobs_8u_c3.cols, blobs_8u_c3.rows,
                                static_cast<int>( blobs_8u_c3.step ), QImage::Format_RGB888 );
 
-        //if( blobs_count < 3 )
-        //{
-        //
-        //}
-        //else
-        //{
-        //    blob b1, b2;
-        //    find_two_largest_blobs( move(blobs), blobs_count, b1, b2 );
-        //}
+        if( blobs_count < 3 )
+        {
+            for( size_t i = 0; i < blobs_count; i++ )
+                mark_blob_center( blobs_q, blobs[i] );
+        }
+        else
+        {
+            blob b1, b2;
+            find_two_largest_blobs( move(blobs), blobs_count, b1, b2 );
+
+            mark_blob_center( blobs_q, b1 );
+            mark_blob_center( blobs_q, b2 );
+        }
 
         emit image_processed( blobs_q.copy() );
 
@@ -102,8 +109,58 @@ namespace dh
         // emit statistics_ready( _statistics );
     }
 
-    void blob_detector::find_two_largest_blobs( shared_ptr<blob[]> blobs, size_t blobs_count, blob& b1, blob& b2 )
+    void blob_detector::find_two_largest_blobs( unique_ptr<blob[]> blobs, size_t blobs_count, blob& b1, blob& b2 )
     {
+        // TODO add tests
 
+        size_t index = 0;
+        auto max = blobs[index].area;
+
+        for( size_t i = 1; i < blobs_count; i++ )
+        {
+            if( blobs[i].area > max )
+            {
+                max = blobs[i].area;
+                index = i;
+            }
+        }
+
+        b1 = blobs[index];
+        blobs[index].area = 0;
+
+        index = 0;
+        max = blobs[index].area;
+
+        for( size_t i = 1; i < blobs_count; i++ )
+        {
+            if( blobs[i].area > max )
+            {
+                max = blobs[i].area;
+                index = i;
+            }
+        }
+
+        b2 = blobs[index];
+    }
+
+    void blob_detector::mark_blob_center( QImage& image, const blob& b )
+    {
+        // TODO check coordinates
+
+        QPainter painter( &image );
+        QPen pen;
+        pen.setWidth( 2 );
+        pen.setColor( Qt::red );
+        painter.setPen( pen ) ;
+
+        const int len = 5;
+        auto x = b.center_x;
+        auto y = b.center_y;
+
+        QVector<QPoint> lines = { {x+len, y+len}, {x-len, y-len},
+                                  {x+len, y-len}, {x-len, y+len} };
+        painter.drawLines( lines );
+
+        painter.end();
     }
 }
