@@ -19,6 +19,8 @@ DhCppStaticLibrary {
     ]
 
     files: [
+        "binarizer.cpp",
+        "binarizer.h",
         "dft.cpp",
         "dft.h",
         "fft.cpp",

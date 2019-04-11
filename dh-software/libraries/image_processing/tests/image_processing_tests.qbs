@@ -6,6 +6,7 @@ DhUnitTests {
     Depends { name: "image_processing" }
 
     files: [
+        "binarizer_tests.cpp",
         "dft_tests.cpp",
         "fft_tests.cpp",
         "gauss_filter_tests.cpp",

@@ -1,6 +1,7 @@
 #include "blob_detector.h"
 #include "image_converter.h"
 #include "gauss_filter.h"
+#include "binarizer.h"
 #include "dh_timer.h"
 
 // TODO
