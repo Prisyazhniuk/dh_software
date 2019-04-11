@@ -84,10 +84,10 @@ namespace dh
         auto blobs = blob_calculator::calculate( blobs_8u, blobs_count );
 
         blobs_8u = blobs_8u != 0;
-        auto blobs_8u_c3 = Mat( rows, cols, CV_8UC3 );
-        cvtColor( blobs_8u, blobs_8u_c3, COLOR_GRAY2RGB );
-        auto blobs_q = QImage( blobs_8u_c3.data, blobs_8u_c3.cols, blobs_8u_c3.rows,
-                               static_cast<int>( blobs_8u_c3.step ), QImage::Format_RGB888 );
+        auto image_8u_c3 = Mat( rows, cols, CV_8UC3 );
+        cvtColor( image_8u, image_8u_c3, COLOR_GRAY2RGB );
+        auto blobs_q = QImage( image_8u_c3.data, image_8u_c3.cols, image_8u_c3.rows,
+                               static_cast<int>( image_8u_c3.step ), QImage::Format_RGB888 );
 
         blob_detection_statistics statistics;
 
