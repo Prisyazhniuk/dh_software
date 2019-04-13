@@ -27,9 +27,14 @@ main_window::main_window( fft_processor* fft_processor,
 
     _ui->setupUi( this );
 
-    _ui->splitter->setStretchFactor( 0, 1 );
-    _ui->splitter->setStretchFactor( 1, 3 );
-    _ui->splitter->setCollapsible( 1, false );
+    _ui->vertical_splitter->setStretchFactor( 0, 1 );
+    _ui->vertical_splitter->setStretchFactor( 1, 3 );
+    _ui->vertical_splitter->setCollapsible( 1, false );
+
+    _ui->horizontal_splitter->setStretchFactor( 0, 3 );
+    _ui->horizontal_splitter->setStretchFactor( 1, 1 );
+    _ui->horizontal_splitter->setCollapsible( 0, false );
+    _ui->horizontal_splitter->setCollapsible( 1, false );
 
     _scene = new QGraphicsScene( this );
     _scene_item = _scene->addPixmap( QPixmap() );
@@ -37,6 +42,16 @@ main_window::main_window( fft_processor* fft_processor,
     _graphics_view = new graphics_view( this );
     _graphics_view->set_scene( _scene );
     _ui->graphics_view_layout->addWidget( _graphics_view );
+
+    auto images_files_filter = make_images_files_filter();
+    _file_system_model = new QFileSystemModel( this );
+    _file_system_model->setRootPath( "" );
+    _file_system_model->setNameFilters( images_files_filter );
+    _file_system_model->setNameFilterDisables( false );
+    _ui->files_tree_view->setModel( _file_system_model );
+    // _ui->files_tree_view->setRootIndex( last_opened );
+    for( int i = 1; i < _file_system_model->columnCount(); i++ )
+        _ui->files_tree_view->hideColumn( i );
 
     _processing_statistics_model = new processing_statisctics_model( this );
     _ui->statistics_view->setModel( _processing_statistics_model );
@@ -86,24 +101,11 @@ void main_window::on_open_image_action_triggered()
 
     dialog.setDirectory( QDir::currentPath() );
 
-    QStringList type_filters;
-    type_filters.push_back( "image/png" );
-    type_filters.push_back( "image/jpeg" );
-    type_filters.push_back( "image/bmp" );
-
-    QMimeDatabase mime_database;
-    QStringList all_images_types;
-    for( auto& filter: type_filters )
-    {
-        auto mime_type = mime_database.mimeTypeForName( filter );
-        if( mime_type.isValid() )
-            all_images_types.append( mime_type.globPatterns() );
-    }
-
+    auto all_images_types = make_images_files_filter();
     auto all_images_filter = QString( "Все файлы изображений (%1)" ).arg( all_images_types.join(' ') );
     auto all_files_filter = QString( "Все файлы (*)" );
 
-    dialog.setMimeTypeFilters( type_filters );
+    dialog.setMimeTypeFilters( _supported_file_types );
 
     auto filters = dialog.nameFilters();
     filters.append( all_images_filter );
@@ -114,8 +116,34 @@ void main_window::on_open_image_action_triggered()
 
     if( dialog.exec() == QDialog::Accepted )
     {
-        auto file_name = dialog.selectedFiles().first();
-        //_fft_processor->run( file_name.toStdString() );
-        _blob_detector->run( file_name.toStdString() );
+        auto file_path = dialog.selectedFiles().first();
+        //_fft_processor->run( file_path.toStdString() );
+        _blob_detector->run( file_path.toStdString() );
     }
+}
+
+QStringList main_window::make_images_files_filter()
+{
+    QMimeDatabase mime_database;
+    QStringList all_images_types;
+    for( auto& filter: _supported_file_types )
+    {
+        auto mime_type = mime_database.mimeTypeForName( filter );
+        if( mime_type.isValid() )
+            all_images_types.append( mime_type.globPatterns() );
+    }
+
+    return all_images_types;
+}
+
+void main_window::on_files_tree_view_activated( const QModelIndex& index )
+{
+    if( _file_system_model->isDir( index ) )
+        return;
+
+    auto file_info = _file_system_model->fileInfo( index );
+    auto file_path = file_info.absoluteFilePath();
+
+    //_fft_processor->run( file_path.toStdString() );
+    _blob_detector->run( file_path.toStdString() );
 }

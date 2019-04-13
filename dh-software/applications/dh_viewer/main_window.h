@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QFileSystemModel>
 
 namespace Ui
 {
@@ -35,8 +36,16 @@ public slots:
 
 private slots:
 	void on_open_image_action_triggered();
+    void on_files_tree_view_activated( const QModelIndex& );
 
 private:
+    QStringList make_images_files_filter();
+
+private:
+    const QStringList _supported_file_types = { "image/png",
+                                                "image/jpeg",
+                                                "image/bmp" };
+
     dh::fft_processor* _fft_processor;
     dh::blob_detector* _blob_detector;
 
@@ -44,6 +53,8 @@ private:
 
     QGraphicsScene* _scene;
     QGraphicsPixmapItem* _scene_item;
+
+    QFileSystemModel* _file_system_model;
 
     dh::processing_statisctics_model* _processing_statistics_model;
 
