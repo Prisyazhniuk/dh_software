@@ -6,8 +6,9 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QFileDialog>
-#include <QDir>
 #include <QMimeDatabase>
+#include <QTimer>
+#include <QDir>
 
 using namespace dh;
 
@@ -18,12 +19,15 @@ main_window::main_window( fft_processor* fft_processor,
     , _fft_processor( fft_processor )
     , _blob_detector( blob_detector )
     , _ui( new Ui::main_window )
+    , _settings_working_path_key( "working_path" )
 {
     if( !fft_processor )
         throw argument_exception( "fft_processor is null", get_exception_source() );
 
     if( !blob_detector )
         throw argument_exception( "blob_detector is null", get_exception_source() );
+
+    _settings = new QSettings( "dh", "dh_viewer", this );
 
     _ui->setupUi( this );
 
@@ -49,9 +53,11 @@ main_window::main_window( fft_processor* fft_processor,
     _file_system_model->setNameFilters( images_files_filter );
     _file_system_model->setNameFilterDisables( false );
     _ui->files_tree_view->setModel( _file_system_model );
-    // _ui->files_tree_view->setRootIndex( last_opened );
     for( int i = 1; i < _file_system_model->columnCount(); i++ )
         _ui->files_tree_view->hideColumn( i );
+
+    auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
+    scroll_files_tree_view( working_path );
 
     _processing_statistics_model = new processing_statisctics_model( this );
     _ui->statistics_view->setModel( _processing_statistics_model );
@@ -99,7 +105,8 @@ void main_window::on_open_image_action_triggered()
 {
     QFileDialog dialog( this, "Открыть изображение" );
 
-    dialog.setDirectory( QDir::currentPath() );
+    auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
+    dialog.setDirectory( working_path );
 
     auto all_images_types = make_images_files_filter();
     auto all_images_filter = QString( "Все файлы изображений (%1)" ).arg( all_images_types.join(' ') );
@@ -117,9 +124,28 @@ void main_window::on_open_image_action_triggered()
     if( dialog.exec() == QDialog::Accepted )
     {
         auto file_path = dialog.selectedFiles().first();
+
+        QFileInfo file_info( file_path );
+        _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+        scroll_files_tree_view( file_path );
+
         //_fft_processor->run( file_path.toStdString() );
         _blob_detector->run( file_path.toStdString() );
     }
+}
+
+void main_window::on_files_tree_view_activated( const QModelIndex& index )
+{
+    if( _file_system_model->isDir( index ) )
+        return;
+
+    auto file_info = _file_system_model->fileInfo( index );
+    auto file_path = file_info.absoluteFilePath();
+
+    _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+
+    //_fft_processor->run( file_path.toStdString() );
+    _blob_detector->run( file_path.toStdString() );
 }
 
 QStringList main_window::make_images_files_filter()
@@ -136,14 +162,27 @@ QStringList main_window::make_images_files_filter()
     return all_images_types;
 }
 
-void main_window::on_files_tree_view_activated( const QModelIndex& index )
+void main_window::scroll_files_tree_view( QString path )
 {
-    if( _file_system_model->isDir( index ) )
+    QFileInfo info( path );
+
+    auto index = _file_system_model->index( path );
+    if( !index.isValid())
         return;
 
-    auto file_info = _file_system_model->fileInfo( index );
-    auto file_path = file_info.absoluteFilePath();
+    if( info.isDir() )
+    {
+        _ui->files_tree_view->setCurrentIndex( index );
+        _ui->files_tree_view->expand( index );
 
-    //_fft_processor->run( file_path.toStdString() );
-    _blob_detector->run( file_path.toStdString() );
+        QTimer::singleShot( 300, [=]()
+        {
+            auto index = _file_system_model->index( path );
+            _ui->files_tree_view->scrollTo( index, QAbstractItemView::PositionAtCenter);
+        } );
+    }
+    else
+    {
+        _ui->files_tree_view->setCurrentIndex( index );
+    }
 }

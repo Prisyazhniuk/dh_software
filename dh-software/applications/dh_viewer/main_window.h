@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QFileSystemModel>
+#include <QSettings>
 
 namespace Ui
 {
@@ -40,6 +41,7 @@ private slots:
 
 private:
     QStringList make_images_files_filter();
+    void scroll_files_tree_view( QString path );
 
 private:
     const QStringList _supported_file_types = { "image/png",
@@ -59,4 +61,7 @@ private:
     dh::processing_statisctics_model* _processing_statistics_model;
 
     dh::graphics_view* _graphics_view;
+
+    QSettings* _settings;
+    const QString _settings_working_path_key;
 };
