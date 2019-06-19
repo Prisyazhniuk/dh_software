@@ -1,6 +1,7 @@
 #include "fft_viewer_core.h"
 #include "image_converter.h"
 #include "dft.h"
+#include "spectrum_shifter.h"
 #include "dh_timer.h"
 
 // TODO
@@ -65,7 +66,7 @@ namespace dh
         auto magnitudes_8u = Mat( rows, cols, CV_8UC1 );
 
         dft dft( cols, rows, image_8u.channels() );
-
+        spectrum_shifter spectrum_shifter( int( magnitudes_8u.step ), rows, magnitudes_8u.channels() );
 
         auto statistics_start_time = dh_timer::now_us();
 
@@ -100,6 +101,7 @@ namespace dh
                 qCritical() << ippGetStatusString( status );
 
             image_converter::convert_32f_8u( magnitudes_32f, magnitudes_8u );
+            spectrum_shifter.shift( magnitudes_8u );
 
             // TODO
             // cvtColor( image_8u, image_8u, COLOR_BGR2RGB );
