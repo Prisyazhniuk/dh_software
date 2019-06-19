@@ -1,3 +1,4 @@
-**/*.qbs.user
+**/*.qbs.user*
 build-*
 3rdparty-mingw/*
+.vscode/*
