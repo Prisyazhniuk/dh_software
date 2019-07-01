@@ -9,6 +9,7 @@
 #include <QMimeDatabase>
 #include <QTimer>
 #include <QDir>
+#include <QMessageBox>
 
 using namespace dh;
 
@@ -59,17 +60,19 @@ main_window::main_window( fft_processor* fft_processor,
     auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
     scroll_files_tree_view( working_path );
 
-    _processing_statistics_model = new processing_statisctics_model( this );
-    _ui->statistics_view->setModel( _processing_statistics_model );
+    _fft_processing_statistics_model = new fft_processing_statistics_model( this );
+    _blob_detection_statistics_model = new blob_detection_statistics_model( this );
+
+    _ui->statistics_view->setModel( _blob_detection_statistics_model );
     _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
     _ui->statistics_view->horizontalHeader()->hide();
     _ui->statistics_view->verticalHeader()->hide();
 
     connect( this, qOverload<const fft_processing_statistics&>( &main_window::update_statistics_model ),
-             _processing_statistics_model, qOverload<const fft_processing_statistics&>( &processing_statisctics_model::update_statistics ) );
+             _fft_processing_statistics_model, &fft_processing_statistics_model::update_statistics );
 
     connect( this, qOverload<const blob_detection_statistics&>( &main_window::update_statistics_model ),
-             _processing_statistics_model, qOverload<const blob_detection_statistics&>( &processing_statisctics_model::update_statistics ) );
+             _blob_detection_statistics_model, &blob_detection_statistics_model::update_statistics );
 
     showMaximized();
 }
@@ -89,6 +92,11 @@ void main_window::image_processed( const QImage& image )
         _scene->setSceneRect( pixmap.rect() );
 
     _scene_item->setPixmap( pixmap );
+}
+
+void main_window::error_notified( const QString& message )
+{
+    QMessageBox::critical( this, "Ошибка", message );
 }
 
 void main_window::statistics_ready( const fft_processing_statistics& s )

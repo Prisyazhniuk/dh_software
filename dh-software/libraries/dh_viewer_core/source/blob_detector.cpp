@@ -7,11 +7,6 @@
 
 #include "dh_timer.h"
 
-// TODO
-#include <QDebug>
-#include <ippi.h>
-#include <ipps.h>
-
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -51,7 +46,7 @@ namespace dh
         auto image_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
         if( image_8u.empty() )
         {
-            qCritical() << "image open error";
+            emit error( "Ошибка загрузки изображения" );
             return;
         }
 

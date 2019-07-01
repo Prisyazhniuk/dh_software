@@ -1,17 +1,17 @@
 #pragma once
 
+#include "error_reporter.h"
 #include "blob_detection_statistics.h"
 #include "blob.h"
 #include "dh_thread.h"
 
 #include <QImage>
 
-#include <atomic>
 #include <string>
 
 namespace dh
 {
-    class blob_detector : public QObject
+    class blob_detector : public error_reporter
     {
         Q_OBJECT
 

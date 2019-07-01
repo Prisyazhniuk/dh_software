@@ -16,6 +16,7 @@ CppApplication {
     cpp.includePaths: product.additionalIncludePaths.concat( project.additionalIncludePaths, product.sourceDirectory )
     cpp.libraryPaths: product.additionalLibraryPaths.concat( project.additionalLibraryPaths )
     cpp.staticLibraries: product.additionalStaticLibraries.concat([
+        "atomic",
         "gtest",
         "gtest_main",
         "gmock"
