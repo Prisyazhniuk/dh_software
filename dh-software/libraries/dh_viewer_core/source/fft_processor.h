@@ -1,5 +1,6 @@
 #pragma once
 
+#include "error_reporter.h"
 #include "fft_processing_statistics.h"
 #include "dh_thread.h"
 
@@ -10,12 +11,11 @@
 
 namespace dh
 {
-    class fft_processor : public QObject
+    class fft_processor : public error_reporter
     {
         Q_OBJECT
 
     public:
-        fft_processor();
         ~fft_processor();
 
         void run( const std::string& image_path );
@@ -34,9 +34,6 @@ namespace dh
         static const int _max_fps = 50;
         static const int _min_processing_time_us = 1000*1000/_max_fps;
 
-        std::atomic_bool _shutdown_signal;
-        dh_thread _processing_thread;
-
-        fft_processing_statistics _statistics;
+        dh_thread _processing_thread;        
     };
 }

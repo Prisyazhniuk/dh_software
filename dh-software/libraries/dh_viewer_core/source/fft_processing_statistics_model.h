@@ -21,9 +21,6 @@ namespace dh
         void update_statistics( const fft_processing_statistics& );
 
     private:
-        static double fps( const fft_processing_statistics& );
-
-    private:
         static const int _rows = 1;
         static const int _cols = 2;
 

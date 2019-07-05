@@ -37,8 +37,8 @@ namespace dh
             auto s = _statistics.load();
 
             if( row == 0 )
-                return col == 0 ? QString( "Fps" ) :
-                                  QString::number( fps(s), 'f', 1 );
+                return col == 0 ? QString( "Время обработки (мс)" ) :
+                                  QString::number( s.time_us / 1000.0, 'f', 1 );
 
             return QVariant();
         }
@@ -55,13 +55,5 @@ namespace dh
         emit dataChanged( createIndex( 0, 0 ),
                           createIndex( _rows-1, _cols-1 ),
                           { Qt::DisplayRole } );
-    }
-
-    double fft_processing_statistics_model::fps( const fft_processing_statistics& s )
-    {
-        if( s.period_us == 0 )
-            return 0;
-
-        return s.frames_processed * 1000 * 1000.0 / s.period_us;
     }
 }

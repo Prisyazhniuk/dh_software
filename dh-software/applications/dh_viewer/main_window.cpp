@@ -63,7 +63,7 @@ main_window::main_window( fft_processor* fft_processor,
     _fft_processing_statistics_model = new fft_processing_statistics_model( this );
     _blob_detection_statistics_model = new blob_detection_statistics_model( this );
 
-    _ui->statistics_view->setModel( _blob_detection_statistics_model );
+    _ui->statistics_view->setModel( _fft_processing_statistics_model );
     _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
     _ui->statistics_view->horizontalHeader()->hide();
     _ui->statistics_view->verticalHeader()->hide();
@@ -137,8 +137,8 @@ void main_window::on_open_image_action_triggered()
         _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
         scroll_files_tree_view( file_path );
 
-        //_fft_processor->run( file_path.toStdString() );
-        _blob_detector->run( file_path.toStdString() );
+        _fft_processor->run( file_path.toStdString() );
+        //_blob_detector->run( file_path.toStdString() );
     }
 }
 
@@ -152,8 +152,8 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
 
     _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-    //_fft_processor->run( file_path.toStdString() );
-    _blob_detector->run( file_path.toStdString() );
+    _fft_processor->run( file_path.toStdString() );
+    //_blob_detector->run( file_path.toStdString() );
 }
 
 QStringList main_window::make_images_files_filter()
