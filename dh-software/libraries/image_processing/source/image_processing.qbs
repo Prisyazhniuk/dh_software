@@ -26,8 +26,6 @@ DhCppStaticLibrary {
         "blob_calculator.h",
         "dft.cpp",
         "dft.h",
-        "fft.cpp",
-        "fft.h",
         "gauss_filter.cpp",
         "gauss_filter.h",
         "image_32fc.cpp",

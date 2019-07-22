@@ -8,7 +8,6 @@ DhUnitTests {
     files: [
         "binarizer_tests.cpp",
         "dft_tests.cpp",
-        "fft_tests.cpp",
         "gauss_filter_tests.cpp",
         "image_32fc_tests.cpp",
         "image_converter_tests.cpp",
