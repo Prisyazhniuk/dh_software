@@ -30,6 +30,8 @@ DhCppStaticLibrary {
         "fft.h",
         "gauss_filter.cpp",
         "gauss_filter.h",
+        "image_32fc.cpp",
+        "image_32fc.h",
         "image_converter.cpp",
         "image_converter.h",
         "image_processing.cpp",

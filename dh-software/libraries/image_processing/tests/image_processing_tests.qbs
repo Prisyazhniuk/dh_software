@@ -10,6 +10,7 @@ DhUnitTests {
         "dft_tests.cpp",
         "fft_tests.cpp",
         "gauss_filter_tests.cpp",
+        "image_32fc_tests.cpp",
         "image_converter_tests.cpp",
         "label_marker_tests.cpp",
         "spectrum_shifter_tests.cpp",
