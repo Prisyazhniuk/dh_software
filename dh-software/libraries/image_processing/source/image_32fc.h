@@ -12,16 +12,18 @@ namespace dh
         image_32fc( int width, int height );
         ~image_32fc();
 
-        int width();
-        int height();
-        int step();
+        int width() const;
+        int height() const;
+        int step_in_bytes() const;
 
-        Ipp32fc* data();
+        Ipp32fc& at( int x, int y ) const;
+
+        Ipp32fc* data() const;
 
     private:
         int _width;
         int _height;
-        int _step;
+        int _step_in_bytes;
 
         Ipp32fc* _data;
     };

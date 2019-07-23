@@ -215,3 +215,53 @@ TEST( image_converter_tests, convert_32f_8u_c3_works )
 			EXPECT_EQ( image_8u.at<Vec3b>(r, c)[2], i++ );
 		}
 }
+
+TEST( image_converter_tests, convert_8u_32fc_only_one_channel_supported )
+{
+    auto image_8u = Mat( 3, 3, CV_8UC3 );
+    auto image_32fc = dh::image_32fc( 3, 3 );
+    EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
+}
+
+TEST( image_converter_tests, convert_8u_32fc_wrong_depth_throws_exception )
+{
+    auto image_8u = Mat( 3, 3, CV_16UC1 );
+    auto image_32fc = dh::image_32fc( 3, 3 );
+    EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
+}
+
+TEST( image_converter_tests, convert_8u_32fc_different_size_throws_exception )
+{
+    auto image_8u = Mat( 3, 3, CV_8UC1 );
+
+    {
+        auto image_32fc = dh::image_32fc( 3, 4 );
+        EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
+    }
+
+    {
+        auto image_32fc = dh::image_32fc( 4, 3 );
+        EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
+    }
+}
+
+TEST( image_converter_tests, convert_8u_32fc_works )
+{
+    auto image_8u = Mat( 3, 3, CV_8UC1 );
+    auto image_32fc = dh::image_32fc( 3, 3 );
+
+    uint8_t i = 0;
+    for( int r = 0; r < 3; r++ )
+        for( int c = 0; c < 3; c++ )
+            image_8u.at<uint8_t>(r, c) = i++;
+
+    image_converter::convert_8u_32fc( image_8u, image_32fc );
+
+    float f = 0;
+    for( int y = 0; y < 3; y++ )
+        for( int x = 0; x < 3; x++ )
+        {
+            EXPECT_FLOAT_EQ( image_32fc.at(x, y).re, f++ );
+            EXPECT_FLOAT_EQ( image_32fc.at(x, y).im, 0.0f );
+        }
+}

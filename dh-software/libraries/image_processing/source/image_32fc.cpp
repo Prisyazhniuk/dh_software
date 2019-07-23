@@ -15,7 +15,7 @@ namespace dh
         if( height <= 0 )
             throw argument_exception( "height not positive", get_exception_source() );
 
-        _data = ippiMalloc_32fc_C1( width, height, &_step );
+        _data = ippiMalloc_32fc_C1( width, height, &_step_in_bytes );
     }
 
     image_32fc::~image_32fc()
@@ -23,22 +23,29 @@ namespace dh
         ippiFree( _data );
     }
 
-    int image_32fc::width()
+    int image_32fc::width() const
     {
         return _width;
     }
 
-    int image_32fc::height()
+    int image_32fc::height() const
     {
         return _height;
     }
 
-    int image_32fc::step()
+    int image_32fc::step_in_bytes() const
     {
-        return _step;
+        return _step_in_bytes;
     }
 
-    Ipp32fc* image_32fc::data()
+    Ipp32fc& image_32fc::at( int x, int y ) const
+    {
+        auto offset = size_t(_step_in_bytes*y) + sizeof(Ipp32fc)*size_t(x);
+        auto ptr = reinterpret_cast<uint8_t*>( _data );
+        return *reinterpret_cast<Ipp32fc*>( ptr + offset );
+    }
+
+    Ipp32fc* image_32fc::data() const
     {
         return _data;
     }

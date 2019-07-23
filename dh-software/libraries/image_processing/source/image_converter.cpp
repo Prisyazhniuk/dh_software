@@ -125,4 +125,23 @@ namespace dh
         if( status != ippStsNoErr )
             throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
     }
+
+    void image_converter::convert_8u_32fc( const Mat& image_8u, image_32fc& image_32fc )
+    {
+        if( image_8u.channels() != 1 )
+            throw argument_exception( "only one-channel images supported", get_exception_source() );
+
+        if( image_8u.depth() != CV_8U )
+            throw argument_exception( "image_8u has wrong depth", get_exception_source() );
+
+        if( image_8u.cols != image_32fc.width() )
+            throw argument_exception( "images width is different", get_exception_source() );
+
+        if( image_8u.rows != image_32fc.height() )
+            throw argument_exception( "images height is different", get_exception_source() );
+
+        for( int r = 0; r < image_8u.rows; r++ )
+            for( int c = 0; c < image_8u.cols; c++ )
+                image_32fc.at(c, r) = { float( image_8u.at<uint8_t>(r, c) ), 0.0f };
+    }
 }

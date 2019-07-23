@@ -23,13 +23,39 @@ TEST( image_32fc_tests, step_is_correct )
 {
     {
         image_32fc image( 1, 15 );
-        EXPECT_EQ( 64, image.step() );
+        EXPECT_EQ( 64, image.step_in_bytes() );
     }
 
     {
         image_32fc image( 9, 15 );
-        EXPECT_EQ( 128, image.step() );
+        EXPECT_EQ( 128, image.step_in_bytes() );
     }
+}
+
+TEST( image_32fc_tests, at_works )
+{
+    image_32fc image( 2, 2 );
+
+    image.at( 0, 0 ) = { 1, 11 };
+    image.at( 1, 0 ) = { 2, 22 };
+    image.at( 0, 1 ) = { 3, 33 };
+    image.at( 1, 1 ) = { 4, 44 };
+
+    auto data = image.data();
+    EXPECT_FLOAT_EQ( 1, data->re );
+    EXPECT_FLOAT_EQ( 11, data->im );
+
+    data++;
+    EXPECT_FLOAT_EQ( 2, data->re );
+    EXPECT_FLOAT_EQ( 22, data->im );
+
+    data = image.data() + size_t(image.step_in_bytes()) / sizeof(Ipp32fc);
+    EXPECT_FLOAT_EQ( 3, data->re );
+    EXPECT_FLOAT_EQ( 33, data->im );
+
+    data++;
+    EXPECT_FLOAT_EQ( 4, data->re );
+    EXPECT_FLOAT_EQ( 44, data->im );
 }
 
 TEST( image_32fc_tests, data_is_correct )
