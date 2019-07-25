@@ -5,74 +5,47 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/core.hpp>
 
-#include <iostream>
+#include <ippi.h>
 
 #include <gtest/gtest.h>
 
 using namespace dh;
 using cv::Mat;
-using cv::Scalar;
 
-using namespace std;
 using namespace testing;
-
-TEST( dft_tests, constructor_wrong_channels_throws_exception )
-{
-    EXPECT_THROW( dft( 7, 7, 3 ), argument_exception );
-}
 
 TEST( dft_tests, forward_wrong_src_throws_exception )
 {
     {
-        dft dft( 7, 7, 1 );
-        auto magnitudes_32f = Mat( 7, 7, CV_32FC1 );
+        dft dft( 7, 7 );
+        auto dst = image_32fc( 7, 7 );
 
         {
-            auto src = Mat( 7, 8, CV_32FC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
+            auto src = image_32fc( 7, 8 );
+            EXPECT_THROW( dft.forward( src, dst ), argument_exception );
         }
 
         {
-            auto src = Mat( 8, 7, CV_32FC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
-        }
-
-        {
-            auto src = Mat( 7, 7, CV_32FC3 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
-        }
-
-        {
-            auto src = Mat( 7, 7, CV_8UC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
+            auto src = image_32fc( 8, 7 );
+            EXPECT_THROW( dft.forward( src, dst ), argument_exception );
         }
     }
 }
 
-TEST( dft_tests, forward_wrong_magnitudes_throws_exception )
+TEST( dft_tests, forward_wrong_dst_throws_exception )
 {
     {
-        dft dft( 7, 7, 1 );
-        auto src = Mat( 7, 7, CV_32FC1 );
+        dft dft( 7, 7 );
+        auto src = image_32fc( 7, 7 );
 
         {
-            auto magnitudes_32f = Mat( 7, 8, CV_32FC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
+            auto dst = image_32fc( 7, 8 );
+            EXPECT_THROW( dft.forward( src, dst ), argument_exception );
         }
 
         {
-            auto magnitudes_32f = Mat( 8, 7, CV_32FC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
-        }
-
-        {
-            auto magnitudes_32f = Mat( 7, 7, CV_32FC3 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
-        }
-
-        {
-            auto magnitudes_32f = Mat( 7, 7, CV_8UC1 );
-            EXPECT_THROW( dft.forward( src, magnitudes_32f ), argument_exception );
+            auto dst = image_32fc( 8, 7 );
+            EXPECT_THROW( dft.forward( src, dst ), argument_exception );
         }
     }
 }
@@ -89,18 +62,27 @@ TEST( dft_tests, works )
                        0, 0,   0,   0,   0, 0, 0,
                        0, 0,   0,   0,   0, 0, 0 };
 
-    auto cols = 7;
-    auto rows = 7;
+    auto width = 7;
+    auto height = 7;
 
-    auto image_8u = Mat( rows, cols, CV_8UC1, static_cast<void*>( data ) );
-    auto image_32f = Mat( rows, cols, CV_32FC1 );
-    auto magnitudes_32f = Mat( rows, cols, CV_32FC1 );
+    auto src_32fc = image_32fc( width, height );
+    auto dst_32fc = image_32fc( width, height );
 
-    dft dft( cols, rows, image_8u.channels() );
+    auto src_8u = Mat( height, width, CV_8UC1, static_cast<void*>( data ) );
 
-    image_converter::convert_8u_32f( image_8u, image_32f );
+    image_converter::convert_8u_32fc( src_8u, src_32fc );
 
-    dft.forward( image_32f, magnitudes_32f );
+    dft dft( width, height );
+
+    dft.forward( src_32fc, dst_32fc );
+
+    auto magnitudes_32f = Mat( height, width, CV_32FC1 );
+
+    auto status = ippiMagnitude_32fc32f_C1R( dst_32fc.data(), dst_32fc.step_in_bytes(),
+                                             magnitudes_32f.ptr<float>(), int( magnitudes_32f.step ),
+                                             { width, height } );
+    if( status != ippStsNoErr )
+        throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
 
     float expected_data[] = { 2295.00000f, 1718.93930f, 424.542940f, 613.482360f, 613.482360f, 424.542940f, 1718.93930f,
                               1718.93930f, 1287.47390f, 317.979800f, 459.494170f, 459.494110f, 317.979800f, 1287.47390f,
@@ -110,11 +92,7 @@ TEST( dft_tests, works )
                                424.54294f,  317.97977f,  78.534523f, 113.485695f, 113.485680f,  78.534523f,  317.97980f,
                               1718.93930f, 1287.47390f, 317.979800f, 459.494110f, 459.494170f, 317.979800f, 1287.47390f };
 
-    auto expected_magnitudes_32f = Mat( rows, cols, CV_32FC1, static_cast<void*>( expected_data ) );
-
-    EXPECT_EQ( expected_magnitudes_32f.rows, magnitudes_32f.rows );
-    EXPECT_EQ( expected_magnitudes_32f.cols, magnitudes_32f.cols );
-    EXPECT_EQ( expected_magnitudes_32f.channels(), magnitudes_32f.channels() );
+    auto expected_magnitudes_32f = Mat( height, width, CV_32FC1, static_cast<void*>( expected_data ) );
 
     auto diff = expected_magnitudes_32f != magnitudes_32f;
     bool magnitudes_are_eq = cv::countNonZero(diff) == 0;

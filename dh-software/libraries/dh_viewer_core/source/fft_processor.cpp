@@ -40,32 +40,39 @@ namespace dh
 
     void fft_processor::processing_thread( const string& image_path )
     {
-        auto image_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
-        if( image_8u.empty() )
+        auto src_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
+        if( src_8u.empty() )
         {
             emit error( "Ошибка загрузки изображения" );
             return;
         }        
 
-        auto rows = image_8u.rows;
-        auto cols = image_8u.cols;
+        auto width = src_8u.cols;
+        auto height = src_8u.rows;
 
-        auto image_32f = Mat( rows, cols, CV_32FC1 );
-        auto magnitudes_32f = Mat( rows, cols, CV_32FC1 );
-        auto magnitudes_8u = Mat( rows, cols, CV_8UC1 );
 
-        dft dft( cols, rows, image_8u.channels() );
-        spectrum_shifter spectrum_shifter( int( magnitudes_8u.step ), rows, magnitudes_8u.channels() );
+        auto src_32fc = image_32fc( width, height );
+        auto magnitudes_32fc = image_32fc( width, height );
+        auto magnitudes_32f = Mat( height, width, CV_32FC1 );
+        auto magnitudes_8u = Mat( height, width, CV_8UC1 );
+
+        dft dft( width, height );
+        spectrum_shifter spectrum_shifter( int( magnitudes_8u.step ), height, magnitudes_8u.channels() );
 
         auto frame_processing_start_time = dh_timer::now_us();
 
-        image_converter::convert_8u_32f( image_8u, image_32f );
+        image_converter::convert_8u_32fc( src_8u, src_32fc );
 
-        dft.forward( image_32f, magnitudes_32f );
+        dft.forward( src_32fc, magnitudes_32fc );
 
-        auto status = ippiLn_32f_C1IR( magnitudes_32f.ptr<float>(),
-                                       static_cast<int>( magnitudes_32f.step ),
-                                       {cols, rows} );
+        auto status = ippiMagnitude_32fc32f_C1R( magnitudes_32fc.data(), magnitudes_32fc.step_in_bytes(),
+                                                 magnitudes_32f.ptr<float>(), int( magnitudes_32f.step ),
+                                                 { width, height } );
+        if( status != ippStsNoErr )
+            throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
+
+        status = ippiLn_32f_C1IR( magnitudes_32f.ptr<float>(), static_cast<int>( magnitudes_32f.step ),
+                                  { width, height } );
         if( status != ippStsNoErr )
         {
             emit error( QString("ippiLn_32f_C1IR() error: %1").arg( ippGetStatusString( status ) ) );
@@ -75,7 +82,7 @@ namespace dh
         float min, max;
         status = ippiMinMax_32f_C1R( magnitudes_32f.ptr<float>(),
                                      static_cast<int>( magnitudes_32f.step ),
-                                     {cols, rows}, &min, &max );
+                                     { width, height }, &min, &max );
         if( status != ippStsNoErr )
         {
             emit error( QString("ippiMinMax_32f_C1R() error: %1").arg( ippGetStatusString( status ) ) );
@@ -85,7 +92,7 @@ namespace dh
         float sub = min;
         float div = ( max-min ) / 255.0f;
         status = ippsNormalize_32f_I( magnitudes_32f.ptr<float>(),
-                                      rows * static_cast<int>( magnitudes_32f.step / sizeof(float) ),
+                                      height * static_cast<int>( magnitudes_32f.step / sizeof(float) ),
                                       sub, div );
         if( status != ippStsNoErr )
         {
