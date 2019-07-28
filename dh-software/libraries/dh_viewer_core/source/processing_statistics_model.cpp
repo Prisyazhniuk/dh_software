@@ -1,24 +1,24 @@
-#include "fft_processing_statistics_model.h"
+#include "processing_statistics_model.h"
 
 namespace dh
 {
-    fft_processing_statistics_model::fft_processing_statistics_model( QObject* parent )
+    processing_statistics_model::processing_statistics_model( QObject* parent )
         : QAbstractTableModel ( parent )
     {
         _statistics.store( {} );
     }
 
-    int fft_processing_statistics_model::rowCount( const QModelIndex& ) const
+    int processing_statistics_model::rowCount( const QModelIndex& ) const
     {
         return _rows;
     }
 
-    int fft_processing_statistics_model::columnCount( const QModelIndex& ) const
+    int processing_statistics_model::columnCount( const QModelIndex& ) const
     {
         return _cols;
     }
 
-    QVariant fft_processing_statistics_model::data(const QModelIndex& index, int role ) const
+    QVariant processing_statistics_model::data(const QModelIndex& index, int role ) const
     {
         if( !index.isValid() )
             return QVariant();
@@ -48,7 +48,7 @@ namespace dh
         }
     }
 
-    void fft_processing_statistics_model::update_statistics( const fft_processing_statistics& s )
+    void processing_statistics_model::update_statistics( const processing_statistics& s )
     {
         _statistics = s;
 

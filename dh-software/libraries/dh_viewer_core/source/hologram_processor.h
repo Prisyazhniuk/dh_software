@@ -1,7 +1,7 @@
 #pragma once
 
 #include "error_reporter.h"
-#include "fft_processing_statistics.h"
+#include "processing_statistics.h"
 #include "dh_thread.h"
 
 #include <QImage>
@@ -11,19 +11,19 @@
 
 namespace dh
 {
-    class fft_processor : public error_reporter
+    class hologram_processor : public error_reporter
     {
         Q_OBJECT
 
     public:
-        ~fft_processor();
+        ~hologram_processor();
 
-        void run( const std::string& image_path );
+        void reconstruct( const std::string& image_path );
         void stop();
 
     signals:
         void image_processed( const QImage& );
-        void statistics_ready( const fft_processing_statistics& );
+        void statistics_ready( const processing_statistics& );
 
     private:
         void processing_thread( const std::string& image_path );

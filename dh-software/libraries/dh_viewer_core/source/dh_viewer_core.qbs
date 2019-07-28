@@ -24,10 +24,10 @@ DhCppStaticLibrary {
         "blob_detector.h",
         "error_reporter.cpp",
         "error_reporter.h",
-        "fft_processing_statistics.h",
-        "fft_processing_statistics_model.cpp",
-        "fft_processing_statistics_model.h",
-        "fft_processor.cpp",
-        "fft_processor.h",
+        "hologram_processor.cpp",
+        "hologram_processor.h",
+        "processing_statistics.h",
+        "processing_statistics_model.cpp",
+        "processing_statistics_model.h",
     ]   
 }

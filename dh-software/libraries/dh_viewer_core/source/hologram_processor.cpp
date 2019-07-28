@@ -1,4 +1,4 @@
-#include "fft_processor.h"
+#include "hologram_processor.h"
 #include "image_converter.h"
 #include "dft.h"
 #include "spectrum_shifter.h"
@@ -17,28 +17,28 @@ using namespace std;
 
 namespace dh
 {
-    fft_processor::~fft_processor()
+    hologram_processor::~hologram_processor()
     {
         stop();
     }
 
-    void fft_processor::run( const string& image_path )
+    void hologram_processor::reconstruct( const string& image_path )
     {
         stop();
 
-        _processing_thread = dh_thread( "fft_processor thread",
-                                        &fft_processor::processing_thread,
+        _processing_thread = dh_thread( "hologram_processor thread",
+                                        &hologram_processor::processing_thread,
                                         this,
                                         image_path );
     }
 
-    void fft_processor::stop()
+    void hologram_processor::stop()
     {
         if( _processing_thread.joinable() )
             _processing_thread.join();
     }
 
-    void fft_processor::processing_thread( const string& image_path )
+    void hologram_processor::processing_thread( const string& image_path )
     {
         auto src_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
         if( src_8u.empty() )
@@ -108,7 +108,7 @@ namespace dh
 
         emit image_processed( magnitudes_q.copy() );
 
-        fft_processing_statistics statistics;
+        processing_statistics statistics;
         statistics.time_us = dh_timer::now_us() - frame_processing_start_time;
         emit statistics_ready( statistics );
     }
