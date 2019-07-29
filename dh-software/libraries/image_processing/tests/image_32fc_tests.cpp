@@ -19,7 +19,7 @@ TEST( image_32fc_tests, sizes_is_correct )
     EXPECT_EQ( 15, image.height() );
 }
 
-TEST( image_32fc_tests, step_is_correct )
+TEST( image_32fc_tests, step_in_bytes_is_correct )
 {
     {
         image_32fc image( 1, 15 );
@@ -31,6 +31,22 @@ TEST( image_32fc_tests, step_is_correct )
         EXPECT_EQ( 128, image.step_in_bytes() );
     }
 }
+
+TEST( image_32fc_tests, step_in_elements_is_correct )
+{
+    {
+        image_32fc image( 1, 15 );
+        auto expected_step = int( 64 / sizeof(Ipp32fc) );
+        EXPECT_EQ( expected_step, image.step_in_elements() );
+    }
+
+    {
+        image_32fc image( 9, 15 );
+        auto expected_step = int( 128 / sizeof(Ipp32fc) );
+        EXPECT_EQ( expected_step, image.step_in_elements() );
+    }
+}
+
 
 TEST( image_32fc_tests, at_works )
 {

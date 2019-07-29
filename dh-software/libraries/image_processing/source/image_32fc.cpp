@@ -38,6 +38,11 @@ namespace dh
         return _step_in_bytes;
     }
 
+    int image_32fc::step_in_elements() const
+    {
+        return _step_in_bytes / int( sizeof( Ipp32fc ) );
+    }
+
     Ipp32fc& image_32fc::at( int x, int y ) const
     {
         auto offset = size_t(_step_in_bytes*y) + sizeof(Ipp32fc)*size_t(x);

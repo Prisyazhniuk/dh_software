@@ -15,6 +15,7 @@ namespace dh
         int width() const;
         int height() const;
         int step_in_bytes() const;
+        int step_in_elements() const;
 
         Ipp32fc& at( int x, int y ) const;
 
