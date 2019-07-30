@@ -18,6 +18,17 @@ namespace dh
         _data = ippiMalloc_32fc_C1( width, height, &_step_in_bytes );
     }
 
+    image_32fc::image_32fc( int width, int height, const Ipp32fc* data, int data_step_in_bytes )
+        : image_32fc( width, height )
+    {
+        auto dst = reinterpret_cast<uint8_t*>( _data );
+        auto src = reinterpret_cast<const uint8_t*>( data );
+        auto size = size_t(width) * sizeof(Ipp32fc);
+
+        for( int row = 0; row < height; row++ )
+            memcpy( dst+row*step_in_bytes(), src+row*data_step_in_bytes, size );
+    }
+
     image_32fc::~image_32fc()
     {
         ippiFree( _data );

@@ -79,3 +79,31 @@ TEST( image_32fc_tests, data_is_correct )
     image_32fc image( 10, 10 );
     EXPECT_TRUE( image.data() != nullptr );
 }
+
+TEST( image_32fc_tests, constructor_with_initizlization_works )
+{
+    const Ipp32fc data[] = { { 1, 11 }, { 2, 22 },
+                             { 3, 33 }, { 4, 44 },
+                             { 5, 55 }, { 6, 66 } };
+
+    int step = 2 * sizeof(Ipp32fc);
+    auto image = image_32fc( 2, 3, data, step );
+
+    EXPECT_FLOAT_EQ( 1, image.at( 0, 0 ).re );
+    EXPECT_FLOAT_EQ( 11, image.at( 0, 0 ).im );
+
+    EXPECT_FLOAT_EQ( 2, image.at( 1, 0 ).re );
+    EXPECT_FLOAT_EQ( 22, image.at( 1, 0 ).im );
+
+    EXPECT_FLOAT_EQ( 3, image.at( 0, 1 ).re );
+    EXPECT_FLOAT_EQ( 33, image.at( 0, 1 ).im );
+
+    EXPECT_FLOAT_EQ( 4, image.at( 1, 1 ).re );
+    EXPECT_FLOAT_EQ( 44, image.at( 1, 1 ).im );
+
+    EXPECT_FLOAT_EQ( 5, image.at( 0, 2 ).re );
+    EXPECT_FLOAT_EQ( 55, image.at( 0, 2 ).im );
+
+    EXPECT_FLOAT_EQ( 6, image.at( 1, 2 ).re );
+    EXPECT_FLOAT_EQ( 66, image.at( 1, 2 ).im );
+}

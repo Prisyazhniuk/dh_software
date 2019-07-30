@@ -10,6 +10,7 @@ namespace dh
     {
     public:
         image_32fc( int width, int height );
+        image_32fc( int width, int height, const Ipp32fc* data, int data_step_in_bytes );
         ~image_32fc();
 
         int width() const;
