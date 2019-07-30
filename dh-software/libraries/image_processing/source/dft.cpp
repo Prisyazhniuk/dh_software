@@ -109,4 +109,33 @@ namespace dh
         if( status != ippStsNoErr )
             throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
     }
+
+    void dft::inverse( const image_32fc& src, image_32fc& dst )
+    {
+        if( src.width() != _width )
+            throw argument_exception( dh_string::fs( "src has wrong width: %d, expected: %d",
+                                                     src.width(), _width ),
+                                      get_exception_source() );
+
+        if( src.height() != _height )
+            throw argument_exception( dh_string::fs( "src has wrong height: %d, expected: %d",
+                                                     src.height(), _height ),
+                                      get_exception_source() );
+
+        if( dst.width() != _width )
+            throw argument_exception( dh_string::fs( "dst has wrong width: %d, expected: %d",
+                                                     dst.width(), _width ),
+                                      get_exception_source() );
+
+        if( dst.height() != _height )
+            throw argument_exception( dh_string::fs( "dst has wrong height: %d, expected: %d",
+                                                     dst.height(), _height ),
+                                      get_exception_source() );
+
+        auto status = ippiDFTInv_CToC_32fc_C1R( src.data(), src.step_in_bytes(),
+                                                dst.data(), dst.step_in_bytes(),
+                                                _context, _work_buffer );
+        if( status != ippStsNoErr )
+            throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
+    }
 }

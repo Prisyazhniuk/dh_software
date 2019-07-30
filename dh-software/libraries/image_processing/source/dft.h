@@ -16,9 +16,10 @@ namespace dh
         ~dft();
 
         void forward( const image_32fc& src, image_32fc& dst );
+        void inverse( const image_32fc& src, image_32fc& dst );
 
     private:
-        const int _flags = IPP_FFT_NODIV_BY_ANY;
+        const int _flags = IPP_FFT_DIV_INV_BY_N;
 
         int _width;
         int _height;
