@@ -28,12 +28,9 @@ namespace dh
     private:
         void processing_thread( const std::string& image_path );
 
+
+
     private:
-        static const int _statistics_collection_period_us = 1000*1000;
-
-        static const int _max_fps = 50;
-        static const int _min_processing_time_us = 1000*1000/_max_fps;
-
         dh_thread _processing_thread;        
     };
 }
