@@ -3,6 +3,7 @@
 #include "hologram_processor.h"
 #include "blob_detector.h"
 #include "graphics_view.h"
+#include "processing_settings_model.h"
 #include "processing_statistics_model.h"
 #include "blob_detection_statistics_model.h"
 
@@ -58,6 +59,7 @@ private:
 
     QFileSystemModel* _file_system_model;
 
+    dh::processing_settings_model* _processing_settings_model;
     dh::processing_statistics_model* _processing_statistics_model;
     dh::blob_detection_statistics_model* _blob_detection_statistics_model;
 

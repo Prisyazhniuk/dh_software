@@ -1,5 +1,6 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "float_item_delegate.h"
 
 #include "exceptions/argument_exception.h"
 
@@ -36,10 +37,12 @@ main_window::main_window( hologram_processor* hologram_processor,
     _ui->vertical_splitter->setStretchFactor( 1, 3 );
     _ui->vertical_splitter->setCollapsible( 1, false );
 
-    _ui->horizontal_splitter->setStretchFactor( 0, 3 );
+    _ui->horizontal_splitter->setStretchFactor( 0, 2 );
+    _ui->horizontal_splitter->setStretchFactor( 1, 1 );
     _ui->horizontal_splitter->setStretchFactor( 1, 1 );
     _ui->horizontal_splitter->setCollapsible( 0, false );
     _ui->horizontal_splitter->setCollapsible( 1, false );
+    _ui->horizontal_splitter->setCollapsible( 2, false );
 
     _scene = new QGraphicsScene( this );
     _scene_item = _scene->addPixmap( QPixmap() );
@@ -60,9 +63,29 @@ main_window::main_window( hologram_processor* hologram_processor,
     auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
     scroll_files_tree_view( working_path );
 
+    auto settings = processing_settings
+    {
+        .lambda_mm = 0.0006328f,
+        .sensor_width_mm = 4.24f,
+        .sensor_height_mm = 2.39f,
+        .distance_mm = 23.2f,
+        .theta_rad = 0
+    };
+
+    _processing_settings_model = new processing_settings_model( settings, this );
+    _ui->settings_view->setModel( _processing_settings_model );
+    _ui->settings_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
+    _ui->settings_view->horizontalHeader()->hide();
+    _ui->settings_view->verticalHeader()->hide();
+    _ui->settings_view->setItemDelegateForRow( 0, new float_item_delegate( 8, 0.0000001, _ui->settings_view ) ); // lambda_mm
+    _ui->settings_view->setItemDelegateForRow( 1, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_width_mm
+    _ui->settings_view->setItemDelegateForRow( 2, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_height_mm
+    _ui->settings_view->setItemDelegateForRow( 3, new float_item_delegate( 2, 0.01, _ui->settings_view ) ); // distance_mm
+    _ui->settings_view->setItemDelegateForRow( 4, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // theta_rad
+
+
     _processing_statistics_model = new processing_statistics_model( this );
     _blob_detection_statistics_model = new blob_detection_statistics_model( this );
-
     _ui->statistics_view->setModel( _processing_statistics_model );
     _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
     _ui->statistics_view->horizontalHeader()->hide();
