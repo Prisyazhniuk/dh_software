@@ -23,14 +23,14 @@ namespace dh
         stop();
     }
 
-    void hologram_processor::reconstruct( const string& image_path )
+    void hologram_processor::reconstruct( const string& image_path, const processing_settings& settings )
     {
         stop();
 
         _processing_thread = dh_thread( "hologram_processor thread",
                                         &hologram_processor::processing_thread,
                                         this,
-                                        image_path );
+                                        image_path, settings );
     }
 
     void hologram_processor::stop()
@@ -39,14 +39,8 @@ namespace dh
             _processing_thread.join();
     }
 
-    void hologram_processor::processing_thread( const string& image_path )
+    void hologram_processor::processing_thread( const string& image_path, const processing_settings& s )
     {
-        float lambda = 0.0006328f;
-        float sensor_width = 4.24f;
-        //float sensor_height = 2.39f;
-        float distance = 23.2f;
-        //float theta = 0.0f;
-
         auto frame_processing_start_time = dh_timer::now_us();
 
         auto hologram_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
@@ -59,8 +53,13 @@ namespace dh
         const auto width = hologram_8u.cols;
         const auto height = hologram_8u.rows;
 
-        const float pixel_size = sensor_width / width;
-
+        const float pixel_size_w = s.sensor_width_mm / width;
+        const float pixel_size_h = s.sensor_height_mm / height;
+        if( abs( pixel_size_h - pixel_size_w ) > 0.00005f )
+        {
+            emit error( "Размер пикселя по ширине и высоте не совпадает" );
+            return;
+        }
 
         auto kernel_32fc = image_32fc( width, height );
         auto kernel_fft_32fc = image_32fc( width, height );
@@ -95,7 +94,7 @@ namespace dh
         dft.forward( hologram_32fc, hologram_fft_32fc );
 
 
-        gabor::make_kernel( kernel_32fc, lambda, distance, pixel_size );
+        gabor::make_kernel( kernel_32fc, s.lambda_mm, s.distance_mm, pixel_size_w );
         dft.forward( kernel_32fc, kernel_fft_32fc );
 
 

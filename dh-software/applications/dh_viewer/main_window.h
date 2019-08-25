@@ -39,6 +39,7 @@ public slots:
 private slots:
 	void on_open_image_action_triggered();
     void on_files_tree_view_activated( const QModelIndex& );
+    void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>() );
 
 private:
     QStringList make_images_files_filter();

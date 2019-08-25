@@ -9,6 +9,11 @@ namespace dh
         _settings.store( s );
     }
 
+    processing_settings processing_settings_model::get()
+    {
+        return _settings.load();
+    }
+
     int processing_settings_model::rowCount( const QModelIndex& ) const
     {
         return _rows;

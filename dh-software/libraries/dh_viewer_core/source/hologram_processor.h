@@ -1,6 +1,7 @@
 #pragma once
 
 #include "error_reporter.h"
+#include "processing_settings.h"
 #include "processing_statistics.h"
 #include "dh_thread.h"
 
@@ -18,7 +19,7 @@ namespace dh
     public:
         ~hologram_processor();
 
-        void reconstruct( const std::string& image_path );
+        void reconstruct( const std::string& image_path, const processing_settings& settings );
         void stop();
 
     signals:
@@ -26,9 +27,7 @@ namespace dh
         void statistics_ready( const processing_statistics& );
 
     private:
-        void processing_thread( const std::string& image_path );
-
-
+        void processing_thread( const std::string& image_path, const processing_settings& settings );
 
     private:
         dh_thread _processing_thread;        

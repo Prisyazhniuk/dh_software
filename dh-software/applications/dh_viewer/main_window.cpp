@@ -83,6 +83,8 @@ main_window::main_window( hologram_processor* hologram_processor,
     _ui->settings_view->setItemDelegateForRow( 3, new float_item_delegate( 2, 0.01, _ui->settings_view ) ); // distance_mm
     _ui->settings_view->setItemDelegateForRow( 4, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // theta_rad
 
+    connect( _processing_settings_model, &processing_settings_model::dataChanged,
+             this, &main_window::settings_changed );
 
     _processing_statistics_model = new processing_statistics_model( this );
     _blob_detection_statistics_model = new blob_detection_statistics_model( this );
@@ -160,7 +162,7 @@ void main_window::on_open_image_action_triggered()
         _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
         scroll_files_tree_view( file_path );
 
-        _hologram_processor->reconstruct( file_path.toStdString() );
+        _hologram_processor->reconstruct( file_path.toStdString(), _processing_settings_model->get() );
         //_blob_detector->run( file_path.toStdString() );
     }
 }
@@ -175,8 +177,12 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
 
     _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-    _hologram_processor->reconstruct( file_path.toStdString() );
+    _hologram_processor->reconstruct( file_path.toStdString(), _processing_settings_model->get() );
     //_blob_detector->run( file_path.toStdString() );
+}
+
+void main_window::settings_changed( const QModelIndex&, const QModelIndex&, const QVector<int>& )
+{
 }
 
 QStringList main_window::make_images_files_filter()

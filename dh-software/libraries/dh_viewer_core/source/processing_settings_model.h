@@ -9,8 +9,12 @@ namespace dh
 {
     class processing_settings_model: public QAbstractTableModel
     {
+        Q_OBJECT
+
     public:
         processing_settings_model( const processing_settings&, QObject* parent = nullptr );
+
+        processing_settings get();
 
         virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
         virtual int columnCount( const QModelIndex& parent = QModelIndex() ) const override;
