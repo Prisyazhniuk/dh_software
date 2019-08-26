@@ -53,6 +53,8 @@ private:
     dh::hologram_processor* _hologram_processor;
     dh::blob_detector* _blob_detector;
 
+    cv::Mat _hologram;
+
 	Ui::main_window* _ui;
 
     QGraphicsScene* _scene;

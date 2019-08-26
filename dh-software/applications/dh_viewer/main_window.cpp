@@ -81,7 +81,7 @@ main_window::main_window( hologram_processor* hologram_processor,
     _ui->settings_view->setItemDelegateForRow( 0, new float_item_delegate( 8, 0.0000001, _ui->settings_view ) ); // lambda_mm
     _ui->settings_view->setItemDelegateForRow( 1, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_width_mm
     _ui->settings_view->setItemDelegateForRow( 2, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_height_mm
-    _ui->settings_view->setItemDelegateForRow( 3, new float_item_delegate( 2, 0.01, _ui->settings_view ) ); // distance_mm
+    _ui->settings_view->setItemDelegateForRow( 3, new float_item_delegate( 2, 0.1, _ui->settings_view ) ); // distance_mm
     _ui->settings_view->setItemDelegateForRow( 4, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // theta_rad
 
     connect( _processing_settings_model, &processing_settings_model::dataChanged,
@@ -165,8 +165,8 @@ void main_window::on_open_image_action_triggered()
             _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
             scroll_files_tree_view( file_path );
 
-            auto hologram = image_loader::load( file_path );
-            _hologram_processor->reconstruct( hologram, _processing_settings_model->get() );
+            _hologram = image_loader::load( file_path );
+            _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
         }
         catch( QString& message )
         {
@@ -187,8 +187,8 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
 
         _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-        auto hologram = image_loader::load( file_path );
-        _hologram_processor->reconstruct( hologram, _processing_settings_model->get() );
+        _hologram = image_loader::load( file_path );
+        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
     }
     catch( QString& message )
     {
@@ -198,6 +198,18 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
 
 void main_window::settings_changed( const QModelIndex&, const QModelIndex&, const QVector<int>& )
 {
+    try
+    {
+        if( _hologram.empty() )
+            throw QString( "Изображение не загружено" );
+
+        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+
+    }
+    catch( QString& message )
+    {
+        error_notified( message );
+    }
 }
 
 QStringList main_window::make_images_files_filter()
