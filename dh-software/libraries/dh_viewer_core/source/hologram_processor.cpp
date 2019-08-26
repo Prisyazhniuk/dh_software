@@ -8,7 +8,6 @@
 #include <ippi.h>
 #include <ipps.h>
 
-#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
 #include <iostream>
@@ -23,14 +22,19 @@ namespace dh
         stop();
     }
 
-    void hologram_processor::reconstruct( const string& image_path, const processing_settings& settings )
+    void hologram_processor::reconstruct( const Mat& hologram_8u, const processing_settings& settings )
     {
+        if( hologram_8u.type() != CV_8UC1 )
+        {
+            emit error( "Неподдерживаемый формат изображения" );
+            return;
+        }
+
         stop();
 
         _processing_thread = dh_thread( "hologram_processor thread",
                                         &hologram_processor::processing_thread,
-                                        this,
-                                        image_path, settings );
+                                        this, hologram_8u, settings );
     }
 
     void hologram_processor::stop()
@@ -39,16 +43,9 @@ namespace dh
             _processing_thread.join();
     }
 
-    void hologram_processor::processing_thread( const string& image_path, const processing_settings& s )
+    void hologram_processor::processing_thread( const Mat& hologram_8u, const processing_settings& s )
     {
         auto frame_processing_start_time = dh_timer::now_us();
-
-        auto hologram_8u = imread( image_path.c_str(), IMREAD_GRAYSCALE );
-        if( hologram_8u.empty() )
-        {
-            emit error( "Ошибка загрузки изображения" );
-            return;
-        }
 
         const auto width = hologram_8u.cols;
         const auto height = hologram_8u.rows;

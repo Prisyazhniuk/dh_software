@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "float_item_delegate.h"
+#include "image_loader.h"
 
 #include "exceptions/argument_exception.h"
 
@@ -156,14 +157,21 @@ void main_window::on_open_image_action_triggered()
 
     if( dialog.exec() == QDialog::Accepted )
     {
-        auto file_path = dialog.selectedFiles().first();
+        try
+        {
+            auto file_path = dialog.selectedFiles().first();
 
-        QFileInfo file_info( file_path );
-        _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
-        scroll_files_tree_view( file_path );
+            QFileInfo file_info( file_path );
+            _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+            scroll_files_tree_view( file_path );
 
-        _hologram_processor->reconstruct( file_path.toStdString(), _processing_settings_model->get() );
-        //_blob_detector->run( file_path.toStdString() );
+            auto hologram = image_loader::load( file_path );
+            _hologram_processor->reconstruct( hologram, _processing_settings_model->get() );
+        }
+        catch( QString& message )
+        {
+            error_notified( message );
+        }
     }
 }
 
@@ -172,13 +180,20 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
     if( _file_system_model->isDir( index ) )
         return;
 
-    auto file_info = _file_system_model->fileInfo( index );
-    auto file_path = file_info.absoluteFilePath();
+    try
+    {
+        auto file_info = _file_system_model->fileInfo( index );
+        auto file_path = file_info.absoluteFilePath();
 
-    _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+        _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-    _hologram_processor->reconstruct( file_path.toStdString(), _processing_settings_model->get() );
-    //_blob_detector->run( file_path.toStdString() );
+        auto hologram = image_loader::load( file_path );
+        _hologram_processor->reconstruct( hologram, _processing_settings_model->get() );
+    }
+    catch( QString& message )
+    {
+        error_notified( message );
+    }
 }
 
 void main_window::settings_changed( const QModelIndex&, const QModelIndex&, const QVector<int>& )

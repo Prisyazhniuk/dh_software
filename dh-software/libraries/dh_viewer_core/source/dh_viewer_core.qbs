@@ -26,6 +26,8 @@ DhCppStaticLibrary {
         "error_reporter.h",
         "hologram_processor.cpp",
         "hologram_processor.h",
+        "image_loader.cpp",
+        "image_loader.h",
         "processing_settings.h",
         "processing_settings_model.cpp",
         "processing_settings_model.h",

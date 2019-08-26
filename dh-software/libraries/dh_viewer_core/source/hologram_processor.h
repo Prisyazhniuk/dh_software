@@ -7,8 +7,7 @@
 
 #include <QImage>
 
-#include <atomic>
-#include <string>
+#include <opencv2/core.hpp>
 
 namespace dh
 {
@@ -19,7 +18,7 @@ namespace dh
     public:
         ~hologram_processor();
 
-        void reconstruct( const std::string& image_path, const processing_settings& settings );
+        void reconstruct( const cv::Mat& hologram_8u, const processing_settings& settings );
         void stop();
 
     signals:
@@ -27,7 +26,7 @@ namespace dh
         void statistics_ready( const processing_statistics& );
 
     private:
-        void processing_thread( const std::string& image_path, const processing_settings& settings );
+        void processing_thread( const cv::Mat& hologram_8u, const processing_settings& settings );
 
     private:
         dh_thread _processing_thread;        
