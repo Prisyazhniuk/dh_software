@@ -60,6 +60,7 @@ main_window::main_window( hologram_processor* hologram_processor,
     _ui->files_tree_view->setModel( _file_system_model );
     for( int i = 1; i < _file_system_model->columnCount(); i++ )
         _ui->files_tree_view->hideColumn( i );
+    _ui->files_tree_view->setHeaderHidden( true );
 
     auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
     scroll_files_tree_view( working_path );
@@ -239,7 +240,7 @@ void main_window::scroll_files_tree_view( QString path )
         _ui->files_tree_view->setCurrentIndex( index );
         _ui->files_tree_view->expand( index );
 
-        QTimer::singleShot( 300, [=]()
+        QTimer::singleShot( 500, [=]()
         {
             auto index = _file_system_model->index( path );
             _ui->files_tree_view->scrollTo( index, QAbstractItemView::PositionAtCenter);
