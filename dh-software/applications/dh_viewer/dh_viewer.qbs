@@ -12,6 +12,8 @@ DhCppApplication {
     }
 
     files: [
+        "float_item_delegate.cpp",
+        "float_item_delegate.h",
         "main.cpp",
         "main_window.cpp",
         "main_window.h",

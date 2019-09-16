@@ -1,9 +1,10 @@
 #pragma once
 
-#include "fft_processor.h"
+#include "hologram_processor.h"
 #include "blob_detector.h"
 #include "graphics_view.h"
-#include "fft_processing_statistics_model.h"
+#include "processing_settings_model.h"
+#include "processing_statistics_model.h"
 #include "blob_detection_statistics_model.h"
 
 #include <QMainWindow>
@@ -22,22 +23,23 @@ class main_window: public QMainWindow
 	Q_OBJECT
 
 public:
-    explicit main_window( dh::fft_processor*, dh::blob_detector*, QWidget *parent = nullptr );
+    explicit main_window( dh::hologram_processor*, dh::blob_detector*, QWidget *parent = nullptr );
     virtual ~main_window() override;
 
 signals:
-    void update_statistics_model( const dh::fft_processing_statistics& );
+    void update_statistics_model( const dh::processing_statistics& );
     void update_statistics_model( const dh::blob_detection_statistics& );
 
 public slots:
     void image_processed( const QImage& );
     void error_notified( const QString& );
-    void statistics_ready( const dh::fft_processing_statistics& );
+    void statistics_ready( const dh::processing_statistics& );
     void statistics_ready( const dh::blob_detection_statistics& );
 
 private slots:
 	void on_open_image_action_triggered();
     void on_files_tree_view_activated( const QModelIndex& );
+    void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>() );
 
 private:
     QStringList make_images_files_filter();
@@ -48,8 +50,10 @@ private:
                                                 "image/jpeg",
                                                 "image/bmp" };
 
-    dh::fft_processor* _fft_processor;
+    dh::hologram_processor* _hologram_processor;
     dh::blob_detector* _blob_detector;
+
+    cv::Mat _hologram;
 
 	Ui::main_window* _ui;
 
@@ -58,7 +62,8 @@ private:
 
     QFileSystemModel* _file_system_model;
 
-    dh::fft_processing_statistics_model* _fft_processing_statistics_model;
+    dh::processing_settings_model* _processing_settings_model;
+    dh::processing_statistics_model* _processing_statistics_model;
     dh::blob_detection_statistics_model* _blob_detection_statistics_model;
 
     dh::graphics_view* _graphics_view;

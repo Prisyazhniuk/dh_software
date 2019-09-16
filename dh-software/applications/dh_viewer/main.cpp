@@ -1,5 +1,5 @@
 #include "main_window.h"
-#include "fft_processor.h"
+#include "hologram_processor.h"
 #include "blob_detector.h"
 #include "image_processing.h"
 
@@ -20,18 +20,18 @@ int main( int argc, char *argv[] )
 
         image_processing::initialize_ipp();
 
-        fft_processor fft_processor;
+        hologram_processor hologram_processor;
         blob_detector blob_detector;
 
-        main_window main_window( &fft_processor, &blob_detector );
+        main_window main_window( &hologram_processor, &blob_detector );
         main_window.show();
 
-        qRegisterMetaType<fft_processing_statistics>("fft_processing_statistics");
+        qRegisterMetaType<processing_statistics>("processing_statistics");
         qRegisterMetaType<blob_detection_statistics>("blob_detection_statistics");
 
-        QObject::connect( &fft_processor, &fft_processor::image_processed, &main_window, &main_window::image_processed );        
-        QObject::connect( &fft_processor, &fft_processor::error, &main_window, &main_window::error_notified );
-        QObject::connect( &fft_processor, &fft_processor::statistics_ready, &main_window, qOverload<const fft_processing_statistics&>( &main_window::statistics_ready ) );
+        QObject::connect( &hologram_processor, &hologram_processor::image_processed, &main_window, &main_window::image_processed );
+        QObject::connect( &hologram_processor, &hologram_processor::error, &main_window, &main_window::error_notified );
+        QObject::connect( &hologram_processor, &hologram_processor::statistics_ready, &main_window, qOverload<const processing_statistics&>( &main_window::statistics_ready ) );
 
         QObject::connect( &blob_detector, &blob_detector::image_processed, &main_window, &main_window::image_processed );
         QObject::connect( &blob_detector, &blob_detector::error, &main_window, &main_window::error_notified );

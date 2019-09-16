@@ -1,5 +1,7 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "float_item_delegate.h"
+#include "image_loader.h"
 
 #include "exceptions/argument_exception.h"
 
@@ -13,17 +15,17 @@
 
 using namespace dh;
 
-main_window::main_window( fft_processor* fft_processor,
+main_window::main_window( hologram_processor* hologram_processor,
                           blob_detector* blob_detector,
                           QWidget *parent )
     : QMainWindow( parent )
-    , _fft_processor( fft_processor )
+    , _hologram_processor( hologram_processor )
     , _blob_detector( blob_detector )
     , _ui( new Ui::main_window )
     , _settings_working_path_key( "working_path" )
 {
-    if( !fft_processor )
-        throw argument_exception( "fft_processor is null", get_exception_source() );
+    if( !hologram_processor )
+        throw argument_exception( "hologram_processor is null", get_exception_source() );
 
     if( !blob_detector )
         throw argument_exception( "blob_detector is null", get_exception_source() );
@@ -36,10 +38,12 @@ main_window::main_window( fft_processor* fft_processor,
     _ui->vertical_splitter->setStretchFactor( 1, 3 );
     _ui->vertical_splitter->setCollapsible( 1, false );
 
-    _ui->horizontal_splitter->setStretchFactor( 0, 3 );
+    _ui->horizontal_splitter->setStretchFactor( 0, 2 );
+    _ui->horizontal_splitter->setStretchFactor( 1, 1 );
     _ui->horizontal_splitter->setStretchFactor( 1, 1 );
     _ui->horizontal_splitter->setCollapsible( 0, false );
     _ui->horizontal_splitter->setCollapsible( 1, false );
+    _ui->horizontal_splitter->setCollapsible( 2, false );
 
     _scene = new QGraphicsScene( this );
     _scene_item = _scene->addPixmap( QPixmap() );
@@ -56,20 +60,43 @@ main_window::main_window( fft_processor* fft_processor,
     _ui->files_tree_view->setModel( _file_system_model );
     for( int i = 1; i < _file_system_model->columnCount(); i++ )
         _ui->files_tree_view->hideColumn( i );
+    _ui->files_tree_view->setHeaderHidden( true );
 
     auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
     scroll_files_tree_view( working_path );
 
-    _fft_processing_statistics_model = new fft_processing_statistics_model( this );
-    _blob_detection_statistics_model = new blob_detection_statistics_model( this );
+    auto settings = processing_settings
+    {
+        .lambda_mm = 0.0006328f,
+        .sensor_width_mm = 4.24f,
+        .sensor_height_mm = 2.39f,
+        .distance_mm = 23.2f,
+        .theta_rad = 0
+    };
 
-    _ui->statistics_view->setModel( _fft_processing_statistics_model );
+    _processing_settings_model = new processing_settings_model( settings, this );
+    _ui->settings_view->setModel( _processing_settings_model );
+    _ui->settings_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
+    _ui->settings_view->horizontalHeader()->hide();
+    _ui->settings_view->verticalHeader()->hide();
+    _ui->settings_view->setItemDelegateForRow( 0, new float_item_delegate( 8, 0.0000001, _ui->settings_view ) ); // lambda_mm
+    _ui->settings_view->setItemDelegateForRow( 1, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_width_mm
+    _ui->settings_view->setItemDelegateForRow( 2, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // sensor_height_mm
+    _ui->settings_view->setItemDelegateForRow( 3, new float_item_delegate( 2, 0.1, _ui->settings_view ) ); // distance_mm
+    _ui->settings_view->setItemDelegateForRow( 4, new float_item_delegate( 3, 0.01, _ui->settings_view ) ); // theta_rad
+
+    connect( _processing_settings_model, &processing_settings_model::dataChanged,
+             this, &main_window::settings_changed );
+
+    _processing_statistics_model = new processing_statistics_model( this );
+    _blob_detection_statistics_model = new blob_detection_statistics_model( this );
+    _ui->statistics_view->setModel( _processing_statistics_model );
     _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
     _ui->statistics_view->horizontalHeader()->hide();
     _ui->statistics_view->verticalHeader()->hide();
 
-    connect( this, qOverload<const fft_processing_statistics&>( &main_window::update_statistics_model ),
-             _fft_processing_statistics_model, &fft_processing_statistics_model::update_statistics );
+    connect( this, qOverload<const processing_statistics&>( &main_window::update_statistics_model ),
+             _processing_statistics_model, &processing_statistics_model::update_statistics );
 
     connect( this, qOverload<const blob_detection_statistics&>( &main_window::update_statistics_model ),
              _blob_detection_statistics_model, &blob_detection_statistics_model::update_statistics );
@@ -79,7 +106,7 @@ main_window::main_window( fft_processor* fft_processor,
 
 main_window::~main_window()
 {
-    _fft_processor->stop();
+    _hologram_processor->stop();
     _blob_detector->stop();
     delete _ui;
 }
@@ -99,7 +126,7 @@ void main_window::error_notified( const QString& message )
     QMessageBox::critical( this, "Ошибка", message );
 }
 
-void main_window::statistics_ready( const fft_processing_statistics& s )
+void main_window::statistics_ready( const processing_statistics& s )
 {
     emit update_statistics_model( s );
 }
@@ -131,14 +158,21 @@ void main_window::on_open_image_action_triggered()
 
     if( dialog.exec() == QDialog::Accepted )
     {
-        auto file_path = dialog.selectedFiles().first();
+        try
+        {
+            auto file_path = dialog.selectedFiles().first();
 
-        QFileInfo file_info( file_path );
-        _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
-        scroll_files_tree_view( file_path );
+            QFileInfo file_info( file_path );
+            _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+            scroll_files_tree_view( file_path );
 
-        _fft_processor->run( file_path.toStdString() );
-        //_blob_detector->run( file_path.toStdString() );
+            _hologram = image_loader::load( file_path );
+            _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+        }
+        catch( QString& message )
+        {
+            error_notified( message );
+        }
     }
 }
 
@@ -147,13 +181,36 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
     if( _file_system_model->isDir( index ) )
         return;
 
-    auto file_info = _file_system_model->fileInfo( index );
-    auto file_path = file_info.absoluteFilePath();
+    try
+    {
+        auto file_info = _file_system_model->fileInfo( index );
+        auto file_path = file_info.absoluteFilePath();
 
-    _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
+        _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-    _fft_processor->run( file_path.toStdString() );
-    //_blob_detector->run( file_path.toStdString() );
+        _hologram = image_loader::load( file_path );
+        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+    }
+    catch( QString& message )
+    {
+        error_notified( message );
+    }
+}
+
+void main_window::settings_changed( const QModelIndex&, const QModelIndex&, const QVector<int>& )
+{
+    try
+    {
+        if( _hologram.empty() )
+            throw QString( "Изображение не загружено" );
+
+        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+
+    }
+    catch( QString& message )
+    {
+        error_notified( message );
+    }
 }
 
 QStringList main_window::make_images_files_filter()
@@ -183,7 +240,7 @@ void main_window::scroll_files_tree_view( QString path )
         _ui->files_tree_view->setCurrentIndex( index );
         _ui->files_tree_view->expand( index );
 
-        QTimer::singleShot( 300, [=]()
+        QTimer::singleShot( 500, [=]()
         {
             auto index = _file_system_model->index( path );
             _ui->files_tree_view->scrollTo( index, QAbstractItemView::PositionAtCenter);

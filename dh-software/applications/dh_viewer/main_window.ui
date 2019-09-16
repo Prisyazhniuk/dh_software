@@ -25,6 +25,7 @@
         <enum>Qt::Vertical</enum>
        </property>
        <widget class="QTreeView" name="files_tree_view"/>
+       <widget class="QTableView" name="settings_view"/>
        <widget class="QTableView" name="statistics_view"/>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget_2">
