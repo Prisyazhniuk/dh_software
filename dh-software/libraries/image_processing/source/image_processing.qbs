@@ -19,25 +19,16 @@ DhCppStaticLibrary {
     ]
 
     files: [
-        "binarizer.cpp",
-        "binarizer.h",
-        "blob.h",
-        "blob_calculator.cpp",
-        "blob_calculator.h",
         "dft.cpp",
         "dft.h",
         "gabor.cpp",
         "gabor.h",
-        "gauss_filter.cpp",
-        "gauss_filter.h",
         "image_32fc.cpp",
         "image_32fc.h",
         "image_converter.cpp",
         "image_converter.h",
         "image_processing.cpp",
         "image_processing.h",
-        "label_marker.cpp",
-        "label_marker.h",
         "spectrum_shifter.cpp",
         "spectrum_shifter.h",
     ]

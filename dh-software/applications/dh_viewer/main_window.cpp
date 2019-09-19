@@ -16,19 +16,14 @@
 using namespace dh;
 
 main_window::main_window( hologram_processor* hologram_processor,
-                          blob_detector* blob_detector,
                           QWidget *parent )
     : QMainWindow( parent )
     , _hologram_processor( hologram_processor )
-    , _blob_detector( blob_detector )
     , _ui( new Ui::main_window )
     , _settings_working_path_key( "working_path" )
 {
     if( !hologram_processor )
         throw argument_exception( "hologram_processor is null", get_exception_source() );
-
-    if( !blob_detector )
-        throw argument_exception( "blob_detector is null", get_exception_source() );
 
     _settings = new QSettings( "dh", "dh_viewer", this );
 
@@ -89,7 +84,6 @@ main_window::main_window( hologram_processor* hologram_processor,
              this, &main_window::settings_changed );
 
     _processing_statistics_model = new processing_statistics_model( this );
-    _blob_detection_statistics_model = new blob_detection_statistics_model( this );
     _ui->statistics_view->setModel( _processing_statistics_model );
     _ui->statistics_view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
     _ui->statistics_view->horizontalHeader()->hide();
@@ -98,16 +92,12 @@ main_window::main_window( hologram_processor* hologram_processor,
     connect( this, qOverload<const processing_statistics&>( &main_window::update_statistics_model ),
              _processing_statistics_model, &processing_statistics_model::update_statistics );
 
-    connect( this, qOverload<const blob_detection_statistics&>( &main_window::update_statistics_model ),
-             _blob_detection_statistics_model, &blob_detection_statistics_model::update_statistics );
-
     showMaximized();
 }
 
 main_window::~main_window()
 {
     _hologram_processor->stop();
-    _blob_detector->stop();
     delete _ui;
 }
 
@@ -127,11 +117,6 @@ void main_window::error_notified( const QString& message )
 }
 
 void main_window::statistics_ready( const processing_statistics& s )
-{
-    emit update_statistics_model( s );
-}
-
-void main_window::statistics_ready( const blob_detection_statistics& s )
 {
     emit update_statistics_model( s );
 }

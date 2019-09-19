@@ -17,11 +17,6 @@ DhCppStaticLibrary {
     }
 
     files: [
-        "blob_detection_statistics.h",
-        "blob_detection_statistics_model.cpp",
-        "blob_detection_statistics_model.h",
-        "blob_detector.cpp",
-        "blob_detector.h",
         "error_reporter.cpp",
         "error_reporter.h",
         "hologram_processor.cpp",
