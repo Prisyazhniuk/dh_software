@@ -48,7 +48,7 @@ private:
 
     dh::hologram_processor* _hologram_processor;
 
-    cv::Mat _hologram;
+    cv::Mat _source_image;
 
 	Ui::main_window* _ui;
 

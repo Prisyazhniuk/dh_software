@@ -18,7 +18,7 @@ namespace dh
     public:
         ~hologram_processor();
 
-        void reconstruct( const cv::Mat& hologram_8u, const processing_settings& settings );
+        void reconstruct( const cv::Mat& hologram_8u, const processing_settings& );
         void stop();
 
     signals:
@@ -26,7 +26,7 @@ namespace dh
         void statistics_ready( const processing_statistics& );
 
     private:
-        void processing_thread( const cv::Mat& hologram_8u, const processing_settings& settings );
+        void processing_thread( const cv::Mat& hologram_8u, const processing_settings& );
 
     private:
         dh_thread _processing_thread;        

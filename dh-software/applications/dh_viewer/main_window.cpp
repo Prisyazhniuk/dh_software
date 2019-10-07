@@ -89,8 +89,7 @@ main_window::main_window( hologram_processor* hologram_processor,
     _ui->statistics_view->horizontalHeader()->hide();
     _ui->statistics_view->verticalHeader()->hide();
 
-    connect( this, qOverload<const processing_statistics&>( &main_window::update_statistics_model ),
-             _processing_statistics_model, &processing_statistics_model::update_statistics );
+    connect( this, &main_window::update_statistics_model, _processing_statistics_model, &processing_statistics_model::update_statistics );
 
     showMaximized();
 }
@@ -151,8 +150,8 @@ void main_window::on_open_image_action_triggered()
             _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
             scroll_files_tree_view( file_path );
 
-            _hologram = image_loader::load( file_path );
-            _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+            _source_image = image_loader::load( file_path );
+            _hologram_processor->reconstruct( _source_image, _processing_settings_model->get() );
         }
         catch( QString& message )
         {
@@ -173,8 +172,8 @@ void main_window::on_files_tree_view_activated( const QModelIndex& index )
 
         _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
 
-        _hologram = image_loader::load( file_path );
-        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+        _source_image = image_loader::load( file_path );
+        _hologram_processor->reconstruct( _source_image, _processing_settings_model->get() );
     }
     catch( QString& message )
     {
@@ -186,10 +185,10 @@ void main_window::settings_changed( const QModelIndex&, const QModelIndex&, cons
 {
     try
     {
-        if( _hologram.empty() )
+        if( _source_image.empty() )
             throw QString( "Изображение не загружено" );
 
-        _hologram_processor->reconstruct( _hologram, _processing_settings_model->get() );
+        _hologram_processor->reconstruct( _source_image, _processing_settings_model->get() );
 
     }
     catch( QString& message )

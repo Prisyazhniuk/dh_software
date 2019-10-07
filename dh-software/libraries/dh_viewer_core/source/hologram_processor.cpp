@@ -43,15 +43,15 @@ namespace dh
             _processing_thread.join();
     }
 
-    void hologram_processor::processing_thread( const Mat& hologram_8u, const processing_settings& s )
+    void hologram_processor::processing_thread( const Mat& hologram_8u, const processing_settings& settings )
     {
         auto frame_processing_start_time = dh_timer::now_us();
 
         const auto width = hologram_8u.cols;
         const auto height = hologram_8u.rows;
 
-        const float pixel_size_w = s.sensor_width_mm / width;
-        const float pixel_size_h = s.sensor_height_mm / height;
+        const float pixel_size_w = settings.sensor_width_mm / width;
+        const float pixel_size_h = settings.sensor_height_mm / height;
         if( abs( pixel_size_h - pixel_size_w ) > 0.00005f )
         {
             emit error( "Размер пикселя по ширине и высоте не совпадает" );
@@ -91,7 +91,7 @@ namespace dh
         dft.forward( hologram_32fc, hologram_fft_32fc );
 
 
-        gabor::make_kernel( kernel_32fc, s.lambda_mm, s.distance_mm, pixel_size_w );
+        gabor::make_kernel( kernel_32fc, settings.lambda_mm, settings.distance_mm, pixel_size_w );
         dft.forward( kernel_32fc, kernel_fft_32fc );
 
 

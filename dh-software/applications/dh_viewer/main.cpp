@@ -28,7 +28,7 @@ int main( int argc, char *argv[] )
 
         QObject::connect( &hologram_processor, &hologram_processor::image_processed, &main_window, &main_window::image_processed );
         QObject::connect( &hologram_processor, &hologram_processor::error, &main_window, &main_window::error_notified );
-        QObject::connect( &hologram_processor, &hologram_processor::statistics_ready, &main_window, qOverload<const processing_statistics&>( &main_window::statistics_ready ) );
+        QObject::connect( &hologram_processor, &hologram_processor::statistics_ready, &main_window, &main_window::statistics_ready );
 
         return application.exec();
     }
