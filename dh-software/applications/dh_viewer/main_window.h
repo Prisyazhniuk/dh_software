@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QFileSystemModel>
+#include <QFileDialog>
 #include <QSettings>
 
 namespace Ui
@@ -34,10 +35,17 @@ public slots:
 
 private slots:
 	void on_open_image_action_triggered();
+    void on_save_image_action_triggered();
+
     void on_files_tree_view_activated( const QModelIndex& );
-    void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>() );
+    void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                           const QVector<int> &roles = QVector<int>() );
 
 private:
+    std::optional<QString> execute_file_dialog( const QString& caption, const QString& path,
+                                                QFileDialog::AcceptMode accept_mode,
+                                                QFileDialog::FileMode file_mode,
+                                                bool set_all_files_filter );
     QStringList make_images_files_filter();
     void scroll_files_tree_view( QString path );
 
@@ -54,6 +62,7 @@ private:
 
     QGraphicsScene* _scene;
     QGraphicsPixmapItem* _scene_item;
+    std::mutex _scene_item_mutex;
 
     QFileSystemModel* _file_system_model;
 
@@ -64,4 +73,5 @@ private:
 
     QSettings* _settings;
     const QString _settings_working_path_key;
+    const QString _settings_save_path_key;
 };

@@ -14,6 +14,7 @@
 #include <QMessageBox>
 
 using namespace dh;
+using namespace std;
 
 main_window::main_window( hologram_processor* hologram_processor,
                           QWidget *parent )
@@ -21,6 +22,7 @@ main_window::main_window( hologram_processor* hologram_processor,
     , _hologram_processor( hologram_processor )
     , _ui( new Ui::main_window )
     , _settings_working_path_key( "working_path" )
+    , _settings_save_path_key( "save_path" )
 {
     if( !hologram_processor )
         throw argument_exception( "hologram_processor is null", get_exception_source() );
@@ -104,6 +106,8 @@ void main_window::image_processed( const QImage& image )
 {
     auto pixmap = QPixmap::fromImage( image );
 
+    lock_guard<mutex> lock( _scene_item_mutex );
+
     if( _scene_item->pixmap().rect() != pixmap.rect() )
         _scene->setSceneRect( pixmap.rect() );
 
@@ -122,29 +126,18 @@ void main_window::statistics_ready( const processing_statistics& s )
 
 void main_window::on_open_image_action_triggered()
 {
-    QFileDialog dialog( this, "Открыть изображение" );
-
     auto working_path = _settings->value( _settings_working_path_key, "" ).toString();
-    dialog.setDirectory( working_path );
 
-    auto all_images_types = make_images_files_filter();
-    auto all_images_filter = QString( "Все файлы изображений (%1)" ).arg( all_images_types.join(' ') );
-    auto all_files_filter = QString( "Все файлы (*)" );
-
-    dialog.setMimeTypeFilters( _supported_file_types );
-
-    auto filters = dialog.nameFilters();
-    filters.append( all_images_filter );
-    filters.append( all_files_filter );
-    dialog.setNameFilters(filters);
-
-    dialog.selectNameFilter(all_images_filter);
-
-    if( dialog.exec() == QDialog::Accepted )
+    auto optional_file_path = execute_file_dialog( "Открыть изображение",
+                                                   working_path,
+                                                   QFileDialog::AcceptOpen,
+                                                   QFileDialog::ExistingFile,
+                                                   true );
+    if( optional_file_path.has_value() )
     {
         try
         {
-            auto file_path = dialog.selectedFiles().first();
+            auto file_path = optional_file_path.value();
 
             QFileInfo file_info( file_path );
             _settings->setValue( _settings_working_path_key, file_info.absolutePath() );
@@ -152,6 +145,38 @@ void main_window::on_open_image_action_triggered()
 
             _source_image = image_loader::load( file_path );
             _hologram_processor->reconstruct( _source_image, _processing_settings_model->get() );
+        }
+        catch( QString& message )
+        {
+            error_notified( message );
+        }
+    }
+}
+
+void main_window::on_save_image_action_triggered()
+{
+    lock_guard<mutex> lock( _scene_item_mutex );
+
+    if( _scene_item->pixmap().isNull() )
+        return;
+
+    auto save_path = _settings->value( _settings_save_path_key, "" ).toString();
+
+    auto optional_file_path = execute_file_dialog( "Сохранить изображение",
+                                                   save_path,
+                                                   QFileDialog::AcceptSave,
+                                                   QFileDialog::AnyFile,
+                                                   false );
+    if( optional_file_path.has_value() )
+    {
+        try
+        {
+            auto file_path = optional_file_path.value();
+
+            QFileInfo file_info( file_path );
+            _settings->setValue( _settings_save_path_key, file_info.absolutePath() );
+
+            _scene_item->pixmap().save( file_path );
         }
         catch( QString& message )
         {
@@ -195,6 +220,36 @@ void main_window::settings_changed( const QModelIndex&, const QModelIndex&, cons
     {
         error_notified( message );
     }
+}
+
+optional<QString> main_window::execute_file_dialog( const QString& caption, const QString& path,
+                                                    QFileDialog::AcceptMode accept_mode,
+                                                    QFileDialog::FileMode file_mode, bool set_all_files_filter )
+{
+    QFileDialog dialog( this, caption );
+    dialog.setAcceptMode( accept_mode );
+    dialog.setDirectory( path );
+
+    auto all_images_types = make_images_files_filter();
+    auto all_images_filter = QString( "Все файлы изображений (%1)" ).arg( all_images_types.join(' ') );
+    auto all_files_filter = QString( "Все файлы (*)" );
+
+    dialog.setMimeTypeFilters( _supported_file_types );
+
+    auto filters = dialog.nameFilters();
+    filters.append( all_images_filter );
+    filters.append( all_files_filter );
+    dialog.setNameFilters( filters );
+
+    if( set_all_files_filter )
+        dialog.selectNameFilter( all_images_filter );
+
+    dialog.setFileMode( file_mode );
+
+    if( dialog.exec() == QDialog::Accepted )
+        return dialog.selectedFiles().first();
+    else
+        return nullopt;
 }
 
 QStringList main_window::make_images_files_filter()

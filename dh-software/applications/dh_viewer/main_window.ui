@@ -49,16 +49,25 @@
      <string>Файл</string>
     </property>
     <addaction name="open_image_action"/>
+    <addaction name="save_image_action"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_image_action">
    <property name="text">
-    <string>Открыть</string>
+    <string>Открыть...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="save_image_action">
+   <property name="text">
+    <string>Сохранить как...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>
