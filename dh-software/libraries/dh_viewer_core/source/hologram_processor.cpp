@@ -126,7 +126,7 @@ namespace dh
         }
 
         const float sub = min;
-        const float div = min-max == 0.0f ? 1 : ( min-max ) / 255.0f;
+        const float div = max-min == 0.0f ? 1 : ( max-min ) / 255.0f;
 
         status = ippsNormalize_32f_I( object_32f.ptr<float>(),
                                       height * static_cast<int>( object_32f.step / sizeof(float) ),
@@ -134,14 +134,6 @@ namespace dh
         if( status != ippStsNoErr )
         {
             emit error( QString("ippsNormalize_32f_I() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
-        }
-
-        status = ippsAddC_32f_I( 255.0f, object_32f.ptr<float>(),
-                                 height * static_cast<int>( object_32f.step / sizeof(float) ) );
-        if( status != ippStsNoErr )
-        {
-            emit error( QString("ippsAddC_32f_I() error: %1").arg( ippGetStatusString( status ) ) );
             return;
         }
 
