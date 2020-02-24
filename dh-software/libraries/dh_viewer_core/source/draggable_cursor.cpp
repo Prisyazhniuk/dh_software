@@ -10,6 +10,21 @@ namespace dh
         setAcceptHoverEvents( true );
     }
 
+    void draggable_cursor::verify_position()
+    {
+        if( scene() )
+        {
+            auto p = pos();
+            auto rect = scene()->sceneRect();
+            if( !rect.contains( p ) )
+            {
+                p = fit_to_rect( p, rect );
+                setPos( p );
+                emit moved( p );
+            }
+        }
+    }
+
     QRectF draggable_cursor::boundingRect() const
     {
         auto w = _pen_width;
@@ -30,19 +45,30 @@ namespace dh
         {
             auto new_position = value.toPointF();
             auto rect = scene()->sceneRect();
+
             if( !rect.contains( new_position ) )
-            {
-                new_position.setX( qMin(rect.right(), qMax( new_position.x(), rect.left() ) ) );
-                new_position.setY( qMin(rect.bottom(), qMax( new_position.y(), rect.top() ) ) );
-                return new_position;
-            }
+                return fit_to_rect( new_position, rect );
         }
 
         return QGraphicsItem::itemChange( change, value );
     }
 
-    void draggable_cursor::hoverEnterEvent( QGraphicsSceneHoverEvent* )
+    void draggable_cursor::hoverEnterEvent( QGraphicsSceneHoverEvent* e )
     {
         setCursor( Qt::CrossCursor );
+        QGraphicsItem::hoverEnterEvent( e );
+    }
+
+    void draggable_cursor::mouseReleaseEvent( QGraphicsSceneMouseEvent* e )
+    {
+        emit moved( pos() );
+        QGraphicsItem::mouseReleaseEvent( e );
+    }
+
+    QPointF draggable_cursor::fit_to_rect( const QPointF& p, const QRectF& rect )
+    {
+        auto x = qMin( rect.right(), qMax( p.x(), rect.left() ) );
+        auto y = qMin( rect.bottom(), qMax( p.y(), rect.top() ) );
+        return QPointF( x, y );
     }
 }

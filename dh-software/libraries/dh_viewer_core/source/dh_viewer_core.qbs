@@ -8,7 +8,7 @@ DhCppStaticLibrary {
 
     Depends {
         name: "Qt";
-        submodules: [ "core", "gui" ]
+        submodules: [ "core", "gui", "widgets" ]
     }
 
     Export {
@@ -17,12 +17,16 @@ DhCppStaticLibrary {
     }
 
     files: [
+        "draggable_cursor.cpp",
+        "draggable_cursor.h",
         "error_reporter.cpp",
         "error_reporter.h",
         "hologram_processor.cpp",
         "hologram_processor.h",
         "image_loader.cpp",
         "image_loader.h",
+        "intensity_graph_model.cpp",
+        "intensity_graph_model.h",
         "processing_settings.h",
         "processing_settings_model.cpp",
         "processing_settings_model.h",

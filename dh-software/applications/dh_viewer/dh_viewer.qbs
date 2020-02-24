@@ -12,8 +12,6 @@ DhCppApplication {
     }
 
     files: [
-        "draggable_cursor.cpp",
-        "draggable_cursor.h",
         "float_item_delegate.cpp",
         "float_item_delegate.h",
         "main.cpp",
