@@ -1,6 +1,7 @@
 #include "intensity_graph_model.h"
 
 #include <QRegularExpression>
+#include <QPainter>
 
 namespace dh
 {
@@ -14,12 +15,16 @@ namespace dh
         , _enabled( false )
         , _cursor_1( new draggable_cursor )
         , _cursor_2( new draggable_cursor )
+        , _preview( 300, 150 )
     {
         _cursor_1->setPos( 0, 0 );
         _cursor_2->setPos( 0, 0 );
 
         connect( _cursor_1, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
         connect( _cursor_2, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
+
+        QPainter p( &_preview );
+        p.fillRect( _preview.rect(), QBrush(Qt::white) );
     }
 
     int intensity_graph_model::rowCount( const QModelIndex& ) const
@@ -65,6 +70,20 @@ namespace dh
                     case 2: return toString( _cursor_2->pos() );
                 }
             }
+
+            return QVariant();
+        }
+        else if( role == Qt::DecorationRole )
+        {
+            if( col == 0 && row == 3 )
+                return _preview;
+
+            return QVariant();
+        }
+        else if( role == Qt::SizeHintRole )
+        {
+            if( col == 0 && row == 3 )
+                return _preview.size();
 
             return QVariant();
         }
@@ -157,8 +176,16 @@ namespace dh
         if( index.row() == 0 )
             return Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
 
-        auto is_editable = _enabled ? Qt::ItemIsEditable : Qt::NoItemFlags;
-        return QAbstractTableModel::flags( index ) | is_editable;
+        if( index.row() == 1 || index.row() == 2 )
+        {
+            auto is_editable = _enabled ? Qt::ItemIsEditable : Qt::NoItemFlags;
+            return QAbstractTableModel::flags( index ) | is_editable;
+        }
+
+        if( index.row() == 3 )
+            return QAbstractTableModel::flags( index ) | Qt::ItemIsSelectable | Qt::ItemIsEnabled ;
+
+        return QAbstractTableModel::flags( index );
     }
 
     void intensity_graph_model::image_processed( const QImage& image )
@@ -168,22 +195,20 @@ namespace dh
             _cursor_1->setPos( 0, image.height()/2 );
             _cursor_2->setPos( image.width()-1, image.height()/2 );
 
-            emit dataChanged( createIndex( 0, 0 ),
-                              createIndex( _rows-1, _cols-1 ),
-                              { Qt::DisplayRole } );
+            emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
         }
         else
         {
             _cursor_1->verify_position();
             _cursor_2->verify_position();
+
+            emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
         }
     }
 
     void intensity_graph_model::cursor_moved( const QPointF& )
     {
-        emit dataChanged( createIndex( 0, 0 ),
-                          createIndex( _rows-1, _cols-1 ),
-                          { Qt::DisplayRole } );
+        emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
     }
 
     void intensity_graph_model::enable()

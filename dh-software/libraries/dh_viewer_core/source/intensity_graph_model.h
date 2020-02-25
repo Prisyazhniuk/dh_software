@@ -47,8 +47,10 @@ namespace dh
         draggable_cursor* _cursor_1;
         draggable_cursor* _cursor_2;
 
+        QPixmap _preview;
+
     private:
-        static const int _rows = 3;
+        static const int _rows = 4;
         static const int _cols = 2;
     };
 }

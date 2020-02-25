@@ -90,7 +90,7 @@ namespace dh
             view->setModel( _processing_settings_model );
             view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
             view->horizontalHeader()->hide();
-            view->verticalHeader()->setSectionResizeMode( QHeaderView::Interactive );
+            view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             view->verticalHeader()->hide();
             view->setMinimumSize( 1, 1 );
             view->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
@@ -109,10 +109,12 @@ namespace dh
             auto view = _ui->intensity_graph_view;
 
             _intensity_graph_model = new intensity_graph_model( _scene, _scene_item, this );
+
             view->setModel( _intensity_graph_model );
+            view->setSpan( 3, 0, 1, 2 );
             view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
             view->horizontalHeader()->hide();
-            view->verticalHeader()->setSectionResizeMode( QHeaderView::Interactive );
+            view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             view->verticalHeader()->hide();
             view->setMinimumSize( 1, 1 );
             view->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
@@ -130,7 +132,7 @@ namespace dh
             view->setModel( _processing_statistics_model );
             view->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
             view->horizontalHeader()->hide();
-            view->verticalHeader()->setSectionResizeMode( QHeaderView::Interactive );
+            view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             view->verticalHeader()->hide();
             view->setMinimumSize( 1, 1 );
             view->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
