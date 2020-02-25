@@ -14,9 +14,16 @@ DhCppStaticLibrary {
     Export {
         Depends { name: "image_processing" }
         Depends { name: "common" }
+
+        Depends {
+            name: "Qt";
+            submodules: [ "core", "gui", "widgets" ]
+        }
     }
 
     files: [
+        "bresenham_line_algorithm.cpp",
+        "bresenham_line_algorithm.h",
         "draggable_cursor.cpp",
         "draggable_cursor.h",
         "error_reporter.cpp",
