@@ -30,6 +30,6 @@ namespace dh
 
     private:
         const QColor _color = Qt::red;
-        const qreal _pen_width = 3;
+        const qreal _pen_width = 2;
     };
 }

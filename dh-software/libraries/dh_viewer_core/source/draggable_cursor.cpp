@@ -33,7 +33,7 @@ namespace dh
 
     void draggable_cursor::paint( QPainter* painter, const QStyleOptionGraphicsItem*, QWidget* )
     {
-        painter->setPen( QPen( Qt::red, _pen_width ) );
+        painter->setPen( QPen( _color, _pen_width ) );
         painter->setBrush( QBrush( _color ) );
         painter->drawLine( -10, 0, 10, 0 );
         painter->drawLine( 0, -10, 0, 10 );

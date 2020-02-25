@@ -13,12 +13,15 @@ namespace dh
         , _scene( scene )
         , _scene_item( scene_item )
         , _enabled( false )
-        , _cursor_1( new draggable_cursor )
-        , _cursor_2( new draggable_cursor )
+        , _cursor_1( new draggable_cursor() )
+        , _cursor_2( new draggable_cursor() )
+        , _line ( new QGraphicsLineItem() )
         , _preview( 300, 150 )
     {
         _cursor_1->setPos( 0, 0 );
         _cursor_2->setPos( 0, 0 );
+
+        _line->setPen( QPen( _color, _pen_width ) );
 
         connect( _cursor_1, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
         connect( _cursor_2, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
@@ -136,6 +139,7 @@ namespace dh
                 {
                     auto point = toPoint( value.toString() );
                     _cursor_1->setPos( point );
+                    refresh_line();
                     break;
                 }
                 catch( ... )
@@ -149,6 +153,7 @@ namespace dh
                 {
                     auto point = toPoint( value.toString() );
                     _cursor_2->setPos( point );
+                    refresh_line();
                     break;
                 }
                 catch( ... )
@@ -196,19 +201,19 @@ namespace dh
             _cursor_2->setPos( image.width()-1, image.height()/2 );
 
             emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
+            refresh_line();
         }
         else
         {
             _cursor_1->verify_position();
             _cursor_2->verify_position();
-
-            emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
         }
     }
 
     void intensity_graph_model::cursor_moved( const QPointF& )
     {
         emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
+        refresh_line();
     }
 
     void intensity_graph_model::enable()
@@ -217,12 +222,22 @@ namespace dh
 
         _scene->addItem( _cursor_1 );
         _scene->addItem( _cursor_2 );
+
+        refresh_line();
+        _scene->addItem( _line );
     }
 
     void intensity_graph_model::disable()
     {
         _scene->removeItem( _cursor_1 );
         _scene->removeItem( _cursor_2 );
+        _scene->removeItem( _line );
+    }
+
+    void intensity_graph_model::refresh_line()
+    {
+        auto line = QLineF( _cursor_1->pos(), _cursor_2->pos() );
+        _line->setLine( line );
     }
 
     QPointF intensity_graph_model::toPoint( const QString& s ) const

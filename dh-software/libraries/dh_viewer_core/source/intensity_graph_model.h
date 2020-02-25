@@ -34,6 +34,8 @@ namespace dh
         void enable();
         void disable();
 
+        void refresh_line();
+
         QPointF toPoint( const QString& ) const ;
         QString toString( const QPointF& ) const;
 
@@ -46,11 +48,15 @@ namespace dh
         bool _enabled;
         draggable_cursor* _cursor_1;
         draggable_cursor* _cursor_2;
+        QGraphicsLineItem* _line;
 
         QPixmap _preview;
 
     private:
         static const int _rows = 4;
         static const int _cols = 2;
+
+        const QColor _color = Qt::red;
+        const qreal _pen_width = 1;
     };
 }
