@@ -14,6 +14,8 @@ DhCppApplication {
     files: [
         "float_item_delegate.cpp",
         "float_item_delegate.h",
+        "intensity_graph_widget.cpp",
+        "intensity_graph_widget.h",
         "main.cpp",
         "main_window.cpp",
         "main_window.h",

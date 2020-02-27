@@ -1,4 +1,5 @@
 #include "intensity_graph_model.h"
+#include "bresenham_line_algorithm.h"
 
 #include <QRegularExpression>
 #include <QPainter>
@@ -16,7 +17,6 @@ namespace dh
         , _cursor_1( new draggable_cursor() )
         , _cursor_2( new draggable_cursor() )
         , _line ( new QGraphicsLineItem() )
-        , _preview( 300, 150 )
     {
         _cursor_1->setPos( 0, 0 );
         _cursor_2->setPos( 0, 0 );
@@ -25,9 +25,6 @@ namespace dh
 
         connect( _cursor_1, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
         connect( _cursor_2, &draggable_cursor::moved, this, &intensity_graph_model::cursor_moved );
-
-        QPainter p( &_preview );
-        p.fillRect( _preview.rect(), QBrush(Qt::white) );
     }
 
     int intensity_graph_model::rowCount( const QModelIndex& ) const
@@ -60,7 +57,7 @@ namespace dh
             {
                 switch( row )
                 {
-                    case 0: return "График интенсивности";
+                    case 0: return "Включить";
                     case 1: return "Точка 1";
                     case 2: return "Точка 2";
                 }
@@ -73,20 +70,6 @@ namespace dh
                     case 2: return toString( _cursor_2->pos() );
                 }
             }
-
-            return QVariant();
-        }
-        else if( role == Qt::DecorationRole )
-        {
-            if( col == 0 && row == 3 )
-                return _preview;
-
-            return QVariant();
-        }
-        else if( role == Qt::SizeHintRole )
-        {
-            if( col == 0 && row == 3 )
-                return _preview.size();
 
             return QVariant();
         }
@@ -139,7 +122,7 @@ namespace dh
                 {
                     auto point = toPoint( value.toString() );
                     _cursor_1->setPos( point );
-                    refresh_line();
+                    calculate_intensity();
                     break;
                 }
                 catch( ... )
@@ -153,7 +136,7 @@ namespace dh
                 {
                     auto point = toPoint( value.toString() );
                     _cursor_2->setPos( point );
-                    refresh_line();
+                    calculate_intensity();
                     break;
                 }
                 catch( ... )
@@ -187,9 +170,6 @@ namespace dh
             return QAbstractTableModel::flags( index ) | is_editable;
         }
 
-        if( index.row() == 3 )
-            return QAbstractTableModel::flags( index ) | Qt::ItemIsSelectable | Qt::ItemIsEnabled ;
-
         return QAbstractTableModel::flags( index );
     }
 
@@ -201,7 +181,8 @@ namespace dh
             _cursor_2->setPos( image.width()-1, image.height()/2 );
 
             emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
-            refresh_line();
+            if( _enabled )
+                calculate_intensity();
         }
         else
         {
@@ -213,7 +194,7 @@ namespace dh
     void intensity_graph_model::cursor_moved( const QPointF& )
     {
         emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
-        refresh_line();
+        calculate_intensity();
     }
 
     void intensity_graph_model::enable()
@@ -223,7 +204,7 @@ namespace dh
         _scene->addItem( _cursor_1 );
         _scene->addItem( _cursor_2 );
 
-        refresh_line();
+        calculate_intensity();
         _scene->addItem( _line );
     }
 
@@ -232,12 +213,19 @@ namespace dh
         _scene->removeItem( _cursor_1 );
         _scene->removeItem( _cursor_2 );
         _scene->removeItem( _line );
+
+        emit disabled();
     }
 
-    void intensity_graph_model::refresh_line()
+    void intensity_graph_model::calculate_intensity()
     {
         auto line = QLineF( _cursor_1->pos(), _cursor_2->pos() );
         _line->setLine( line );
+
+        auto image = _scene_item->pixmap().toImage();
+        auto points = bresenham_line_algorithm::calculate( line );
+
+        emit plot( image, points );
     }
 
     QPointF intensity_graph_model::toPoint( const QString& s ) const

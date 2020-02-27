@@ -9,6 +9,8 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QTableView>
+#include <QTreeView>
 #include <QFileSystemModel>
 #include <QFileDialog>
 #include <QSettings>
@@ -40,7 +42,7 @@ namespace dh
         void on_open_image_action_triggered();
         void on_save_image_action_triggered();
 
-        void on_files_tree_view_activated( const QModelIndex& );
+        void input_file_selected( const QModelIndex& );
         void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                const QVector<int> &roles = QVector<int>() );
 
@@ -68,9 +70,11 @@ namespace dh
         std::mutex _scene_item_mutex;
 
         QFileSystemModel* _file_system_model;
+        QTreeView* _file_system_view;
 
         processing_settings_model* _processing_settings_model;
         intensity_graph_model* _intensity_graph_model;
+        QTableView* _intensity_graph_view;
         processing_statistics_model* _processing_statistics_model;
 
         graphics_view* _graphics_view;

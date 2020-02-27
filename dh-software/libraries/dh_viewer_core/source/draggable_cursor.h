@@ -27,6 +27,7 @@ namespace dh
 
     private:
         QPointF fit_to_rect( const QPointF&, const QRectF& rect );
+        QPointF round_point( QPointF );
 
     private:
         const QColor _color = Qt::red;

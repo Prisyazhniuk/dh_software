@@ -24,6 +24,10 @@ namespace dh
 
         virtual Qt::ItemFlags flags( const QModelIndex& index ) const override;
 
+    signals:
+        void plot( const QImage&, const QList<QPoint>& );
+        void disabled();
+
     public slots:
         void image_processed( const QImage& );
 
@@ -34,7 +38,7 @@ namespace dh
         void enable();
         void disable();
 
-        void refresh_line();
+        void calculate_intensity();
 
         QPointF toPoint( const QString& ) const ;
         QString toString( const QPointF& ) const;
@@ -50,10 +54,8 @@ namespace dh
         draggable_cursor* _cursor_2;
         QGraphicsLineItem* _line;
 
-        QPixmap _preview;
-
     private:
-        static const int _rows = 4;
+        static const int _rows = 3;
         static const int _cols = 2;
 
         const QColor _color = Qt::red;

@@ -1,5 +1,7 @@
 #include "draggable_cursor.h"
 
+#include <math.h>
+
 #include <QtWidgets>
 
 namespace dh
@@ -16,9 +18,14 @@ namespace dh
         {
             auto p = pos();
             auto rect = scene()->sceneRect();
+
             if( !rect.contains( p ) )
-            {
                 p = fit_to_rect( p, rect );
+
+            p = round_point( p );
+
+            if( p != pos() )
+            {
                 setPos( p );
                 emit moved( p );
             }
@@ -47,7 +54,11 @@ namespace dh
             auto rect = scene()->sceneRect();
 
             if( !rect.contains( new_position ) )
-                return fit_to_rect( new_position, rect );
+                new_position = fit_to_rect( new_position, rect );
+
+            new_position = round_point( new_position );
+
+            return new_position;
         }
 
         return QGraphicsItem::itemChange( change, value );
@@ -67,8 +78,21 @@ namespace dh
 
     QPointF draggable_cursor::fit_to_rect( const QPointF& p, const QRectF& rect )
     {
-        auto x = qMin( rect.right(), qMax( p.x(), rect.left() ) );
-        auto y = qMin( rect.bottom(), qMax( p.y(), rect.top() ) );
+        auto x = qMin( rect.right()-1, qMax( p.x(), rect.left() ) );
+        auto y = qMin( rect.bottom()-1, qMax( p.y(), rect.top() ) );
         return QPointF( x, y );
+    }
+
+    QPointF draggable_cursor::round_point( QPointF p )
+    {
+        double i;
+
+        if( modf( p.x(), &i ) != 0.5 )
+            p.setX( 0.5 + round( p.x() ) );
+
+        if( modf( p.y(), &i ) != 0.5 )
+            p.setY( 0.5 + round( p.y() ) );
+
+        return p;
     }
 }

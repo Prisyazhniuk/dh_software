@@ -8,7 +8,7 @@ DhCppStaticLibrary {
 
     Depends {
         name: "Qt";
-        submodules: [ "core", "gui", "widgets" ]
+        submodules: [ "core", "gui", "widgets", "charts" ]
     }
 
     Export {
@@ -17,7 +17,7 @@ DhCppStaticLibrary {
 
         Depends {
             name: "Qt";
-            submodules: [ "core", "gui", "widgets" ]
+            submodules: [ "core", "gui", "widgets", "charts" ]
         }
     }
 

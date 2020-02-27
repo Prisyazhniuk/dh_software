@@ -20,15 +20,6 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QSplitter" name="horizontal_splitter">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QTreeView" name="files_tree_view"/>
-       <widget class="QTableView" name="processing_settings_view"/>
-       <widget class="QTableView" name="intensity_graph_view"/>
-       <widget class="QTableView" name="statistics_view"/>
-      </widget>
       <widget class="QWidget" name="verticalLayoutWidget_2">
        <layout class="QVBoxLayout" name="graphics_view_layout"/>
       </widget>
@@ -45,14 +36,20 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="file_menu">
     <property name="title">
      <string>Файл</string>
     </property>
     <addaction name="open_image_action"/>
     <addaction name="save_image_action"/>
    </widget>
-   <addaction name="menu"/>
+   <widget class="QMenu" name="view_menu">
+    <property name="title">
+     <string>Вид</string>
+    </property>
+   </widget>
+   <addaction name="file_menu"/>
+   <addaction name="view_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_image_action">
