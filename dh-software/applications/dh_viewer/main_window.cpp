@@ -12,7 +12,6 @@
 #include <QFileDialog>
 #include <QMimeDatabase>
 #include <QTimer>
-#include <QDir>
 #include <QMessageBox>
 #include <QDockWidget>
 

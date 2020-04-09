@@ -18,6 +18,14 @@ namespace dh
         void clean();
 
     private:
+        void show_context_menu( const QPoint& );
+        void context_menu_save_action();
+
+        bool empty();
+
+        QString export_to_csv();
+
+    private:
         QChart* _chart;
     };
 }
