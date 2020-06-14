@@ -4,6 +4,7 @@
 #include "graphics_view.h"
 #include "processing_settings_model.h"
 #include "processing_statistics_model.h"
+#include "processing_result_type.h"
 #include "intensity_graph_model.h"
 
 #include <QMainWindow>
@@ -14,6 +15,7 @@
 #include <QFileSystemModel>
 #include <QFileDialog>
 #include <QSettings>
+#include <QTabBar>
 
 namespace Ui
 {
@@ -32,9 +34,10 @@ namespace dh
 
     signals:
         void update_statistics_model( const processing_statistics& );
+        void image_shown( const QImage& );
 
     public slots:
-        void image_processed( const QImage& );
+        void processed( const processing_results& );
         void error_notified( const QString& );
         void statistics_ready( const processing_statistics& );
 
@@ -46,6 +49,8 @@ namespace dh
         void settings_changed( const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                const QVector<int> &roles = QVector<int>() );
 
+        void result_tab_selected( int id );
+
     private:
         std::optional<QString> execute_file_dialog( const QString& caption, const QString& path,
                                                     QFileDialog::AcceptMode accept_mode,
@@ -54,12 +59,15 @@ namespace dh
         QStringList make_images_files_filter();
         void scroll_files_tree_view( QString path );
 
+        void show_results( processing_result_type );
+
     private:
         const QStringList _supported_file_types = { "image/png",
                                                     "image/jpeg",
                                                     "image/bmp" };
 
         hologram_processor* _hologram_processor;
+        processing_results _processing_results;
 
         cv::Mat _source_image;
 
@@ -67,6 +75,7 @@ namespace dh
 
         QGraphicsScene* _scene;
         QGraphicsPixmapItem* _scene_item;
+        QTabBar* _results_tab_bar;
         std::mutex _scene_item_mutex;
 
         QFileSystemModel* _file_system_model;

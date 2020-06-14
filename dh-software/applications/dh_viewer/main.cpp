@@ -24,6 +24,7 @@ int main( int argc, char *argv[] )
         main_window main_window( &hologram_processor );
         main_window.show();
 
+        qRegisterMetaType<processing_results>("processing_results");
         qRegisterMetaType<processing_statistics>("processing_statistics");
 
         return application.exec();

@@ -4,84 +4,86 @@
 #include <ippi.h>
 #include <ippcore.h>
 
-using namespace cv;
 using namespace std;
 
 namespace dh
 {
-    spectrum_shifter::spectrum_shifter( int step, int height, int channels )
+    spectrum_shifter::spectrum_shifter( int width, int height )
+        : _buffer( width, height % 2 ? height/2 + 1 : height/2 )
+    {}
+
+    void spectrum_shifter::shift( image_32fc& image )
     {
-        if( step <= 0 )
-            throw argument_exception( "step is invalid", get_exception_source() );
+        auto step = image.step_in_bytes();
+        auto buffer_step = _buffer.step_in_bytes();
 
-        if( height <= 0 )
-            throw argument_exception( "height is invalid", get_exception_source() );
-
-        if( channels != 1 )
-            throw argument_exception( "only one-channel images supported", get_exception_source() );
-
-        auto height_2 = height % 2 ? height/2 + 1 : height/2;
-        auto buffer_size = step * height_2 * channels;
-        _buffer = make_unique<uint8_t[]>( size_t( buffer_size ) );
-    }
-
-    void spectrum_shifter::shift( Mat& m )
-    {
-        int step = int( m.step );
-
-        int width = m.cols;
-        int height = m.rows;
+        auto width = image.width();
+        auto height = image.height();
 
         auto height_2 = height % 2 ? height/2 + 1 : height/2;
         auto width_2 = width % 2 ? width/2 + 1 : width/2;
 
+
         // 1 and 2 to buffer
-        auto status = ippiCopy_8u_C1R( m.data, step,
-                                       _buffer.get(), step,
-                                       { width, height_2 } );
+        auto status = ippiCopy_32f_C1R( reinterpret_cast<Ipp32f*>( image.data() ),
+                                        step,
+                                        reinterpret_cast<Ipp32f*>( _buffer.data() ),
+                                        buffer_step,
+                                        { 2*width, height_2 } );
         if( status != ippStsNoErr )
         {
-            auto msg = dh_string::fs( "ippiCopy_8u_C1R (1 and 2 quadrants) failed: %s", ippGetStatusString( status ) );
+            auto msg = dh_string::fs( "ippiCopy_32f_C1R (1 and 2 quadrants) failed: %s",
+                                      ippGetStatusString( status ) );
             throw image_processing_exception( msg, get_exception_source() );
         }
 
         // 4 to 2
-        status = ippiCopy_8u_C1R( m.ptr( height_2, 0 ), step,
-                                  m.ptr( 0, width/2 ), step,
-                                  { width_2, height/2 } );
+        status = ippiCopy_32f_C1R( reinterpret_cast<Ipp32f*>( &image.at( 0, height_2 ) ),
+                                   step,
+                                   reinterpret_cast<Ipp32f*>( &image.at( width/2, 0 ) ),
+                                   step,
+                                   { 2*width_2, height/2 } );
         if( status != ippStsNoErr )
         {
-            auto msg = dh_string::fs( "ippiCopy_8u_C1R (4 quadrant) failed: %s", ippGetStatusString( status ) );
+            auto msg = dh_string::fs( "ippiCopy_32f_C1R (4 quadrant) failed: %s",
+                                      ippGetStatusString( status ) );
             throw image_processing_exception( msg, get_exception_source() );
         }
 
         // 3 to 1
-        status = ippiCopy_8u_C1R( m.ptr( height_2, width_2 ), step,
-                                  m.ptr( 0, 0 ), step,
-                                  { width/2, height/2 } );
+        status = ippiCopy_32f_C1R( reinterpret_cast<Ipp32f*>( &image.at( width_2, height_2 ) ),
+                                   step,
+                                   reinterpret_cast<Ipp32f*>( &image.at( 0, 0 ) ),
+                                   step,
+                                   { 2*(width/2), height/2 } );
         if( status != ippStsNoErr )
         {
-            auto msg = dh_string::fs( "ippiCopy_8u_C1R (3 quadrant) failed: %s", ippGetStatusString( status ) );
+            auto msg = dh_string::fs( "ippiCopy_32f_C1R (3 quadrant) failed: %s",
+                                      ippGetStatusString( status ) );
             throw image_processing_exception( msg, get_exception_source() );
         }
 
         // buffered 1 to 3
-        status = ippiCopy_8u_C1R( _buffer.get(), step,
-                                  m.ptr( height/2, width/2 ), step,
-                                  { width_2, height_2 } );
+        status = ippiCopy_32f_C1R( reinterpret_cast<Ipp32f*>( _buffer.data() ),
+                                   buffer_step,
+                                   reinterpret_cast<Ipp32f*>( &image.at( width/2, height/2 ) ),
+                                   step,
+                                   { 2*(width_2), height_2 } );
         if( status != ippStsNoErr )
         {
-            auto msg = dh_string::fs( "ippiCopy_8u_C1R (1 quadrant) failed: %s", ippGetStatusString( status ) );
+            auto msg = dh_string::fs( "ippiCopy_32f_C1R (1 quadrant) failed: %s", ippGetStatusString( status ) );
             throw image_processing_exception( msg, get_exception_source() );
         }
 
         // buffered 2 to 4
-        status = ippiCopy_8u_C1R( _buffer.get() + width_2, step,
-                                  m.ptr( height/2, 0 ), step,
-                                  { width/2, height_2 } );
+        status = ippiCopy_32f_C1R( reinterpret_cast<Ipp32f*>( &_buffer.at( width_2, 0 ) ),
+                                   buffer_step,
+                                   reinterpret_cast<Ipp32f*>( &image.at( 0, height/2 ) ),
+                                   step,
+                                   { 2*(width/2), height_2 } );
         if( status != ippStsNoErr )
         {
-            auto msg = dh_string::fs( "ippiCopy_8u_C1R (2 quadrant) failed: %s", ippGetStatusString( status ) );
+            auto msg = dh_string::fs( "ippiCopy_32f_C1R (2 quadrant) failed: %s", ippGetStatusString( status ) );
             throw image_processing_exception( msg, get_exception_source() );
         }
     }

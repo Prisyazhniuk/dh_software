@@ -25,8 +25,9 @@ namespace dh
         auto src = reinterpret_cast<const uint8_t*>( data );
         auto size = size_t(width) * sizeof(Ipp32fc);
 
+        auto step = step_in_bytes();
         for( int row = 0; row < height; row++ )
-            memcpy( dst+row*step_in_bytes(), src+row*data_step_in_bytes, size );
+            memcpy( dst+row*step, src+row*data_step_in_bytes, size );
     }
 
     image_32fc::~image_32fc()

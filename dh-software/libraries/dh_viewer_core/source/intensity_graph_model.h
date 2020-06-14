@@ -29,7 +29,7 @@ namespace dh
         void disabled();
 
     public slots:
-        void image_processed( const QImage& );
+        void image_change( const QImage& );
 
     private slots:
         void cursor_moved( const QPointF& );

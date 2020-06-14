@@ -20,5 +20,6 @@ DhCppApplication {
         "main_window.cpp",
         "main_window.h",
         "main_window.ui",
+        "processing_result_type.h",
     ]   
 }
