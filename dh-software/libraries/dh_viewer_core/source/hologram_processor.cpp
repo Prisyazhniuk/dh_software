@@ -79,6 +79,12 @@ namespace dh
             auto intensity_32f = Mat( height, width, CV_32FC1 );
             auto intensity_8u = Mat( height, width, CV_8UC1 );
 
+            auto real_32f = Mat( height, width, CV_32FC1 );
+            auto real_8u = Mat( height, width, CV_8UC1 );
+
+            auto imaginary_32f = Mat( height, width, CV_32FC1 );
+            auto imaginary_8u = Mat( height, width, CV_8UC1 );
+
             image_converter::convert_8u_32fc( hologram_8u, hologram_32fc );
 
             uint8_t max_src;
@@ -139,6 +145,8 @@ namespace dh
             if( status != ippStsNoErr )
                 throw QString("ippiSqr_32f_C1R() error: %1").arg( ippGetStatusString( status ) );
 
+            image_converter::separate_32fc( object_32fc, real_32f, imaginary_32f );
+
             normalize_32f( phase_32f );
             image_converter::convert_32f_8u( phase_32f, phase_8u );
 
@@ -148,14 +156,20 @@ namespace dh
             normalize_32f( intensity_32f );
             image_converter::convert_32f_8u( intensity_32f, intensity_8u );
 
+            normalize_32f( real_32f );
+            image_converter::convert_32f_8u( real_32f, real_8u );
+
+            normalize_32f( imaginary_32f );
+            image_converter::convert_32f_8u( imaginary_32f, imaginary_8u );
+
             auto results = processing_results
             {
                 .original = hologram_8u,
                 .phase = phase_8u,
                 .amplitude = magnitudes_8u,
                 .intensity = intensity_8u,
-                .real = nullopt,
-                .imaginary = nullopt
+                .real = real_8u,
+                .imaginary = imaginary_8u
             };
 
             emit processed( results );

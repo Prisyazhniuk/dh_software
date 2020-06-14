@@ -2,6 +2,7 @@
 #include "dh_string.h"
 
 #include <ippi.h>
+#include <ipps.h>
 #include <ippcore.h>
 
 using namespace cv;
@@ -143,5 +144,33 @@ namespace dh
         for( int r = 0; r < image_8u.rows; r++ )
             for( int c = 0; c < image_8u.cols; c++ )
                 image_32fc.at(c, r) = { float( image_8u.at<uint8_t>(r, c) ), 0.0f };
+    }
+
+    void image_converter::separate_32fc( const image_32fc& image_32fc, Mat& real_32f, Mat& imaginary_32f )
+    {
+        if( real_32f.channels() != 1 || imaginary_32f.channels() != 1 )
+            throw argument_exception( "only one-channel images supported", get_exception_source() );
+
+        if( real_32f.depth() != CV_32F || imaginary_32f.depth() != CV_32F )
+            throw argument_exception( "invalid depth", get_exception_source() );
+
+        auto width = image_32fc.width();
+        auto height = image_32fc.height();
+
+        if( real_32f.cols != width || imaginary_32f.cols != width )
+            throw argument_exception( "images width is different", get_exception_source() );
+
+        if( real_32f.rows != height || imaginary_32f.rows != height )
+            throw argument_exception( "images height is different", get_exception_source() );
+
+        for( auto r = 0; r < image_32fc.height(); r++ )
+        {
+            auto status = ippsCplxToReal_32fc( &image_32fc.at( 0, r ),
+                                               &real_32f.at<float>( r, 0 ),
+                                               &imaginary_32f.at<float>( r, 0 ),
+                                               width );
+            if( status != ippStsNoErr )
+                throw image_processing_exception( ippGetStatusString( status ), get_exception_source() );
+        }
     }
 }

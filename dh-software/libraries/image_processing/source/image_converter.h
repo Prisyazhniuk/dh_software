@@ -18,5 +18,7 @@ namespace dh
         static void convert_32f_8u( const cv::Mat& image_32f, cv::Mat& image_8u, IppiSize roi = { -1, -1 } );
 
         static void convert_8u_32fc( const cv::Mat& image_8u, image_32fc& image_32fc );
+
+        static void separate_32fc( const image_32fc& image_32fc, cv::Mat& real_32f, cv::Mat& imaginary_32f );
     };
 }
