@@ -4,6 +4,8 @@
 
 #include <QApplication>
 
+#include <windows.h>
+
 #include <string>
 
 using namespace dh;
@@ -13,6 +15,12 @@ int main( int argc, char *argv[] )
 {	
     try
     {
+        if( AttachConsole( ATTACH_PARENT_PROCESS ) /* || AllocConsole() */ )
+        {
+            freopen( "CONOUT$", "w", stdout );
+            freopen( "CONOUT$", "w", stderr );
+        }
+
         QApplication application( argc, argv );
 
         Q_INIT_RESOURCE( icons );
