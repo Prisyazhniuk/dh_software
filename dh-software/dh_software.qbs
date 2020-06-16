@@ -17,7 +17,7 @@ Project {
         //"libraries/qt_helpers/tests/qt_helpers_tests.qbs",
 
         "libraries/dh_viewer_core/source/dh_viewer_core.qbs",
-        //"libraries/dh_viewer_core/tests/dh_viewer_core_tests.qbs",
+        "libraries/dh_viewer_core/tests/dh_viewer_core_tests.qbs",
 
         "libraries/image_processing/source/image_processing.qbs",
         "libraries/image_processing/tests/image_processing_tests.qbs",

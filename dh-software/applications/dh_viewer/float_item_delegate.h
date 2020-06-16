@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QStyledItemDelegate >
+#include <QStyledItemDelegate>
 
 namespace dh
 {

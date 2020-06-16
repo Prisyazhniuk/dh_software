@@ -49,7 +49,6 @@ namespace dh
                     case 2: return "Высота сенсора (мм)";
                     case 3: return "Дистанция (мм)";
                     case 4: return "Угол падения опорной волны (рад)";
-                    default: QVariant();
                 }
             }
             else
@@ -63,7 +62,6 @@ namespace dh
                     case 2: return double( s.sensor_height_mm );
                     case 3: return double( s.distance_mm );
                     case 4: return double( s.theta_rad );
-                    default: QVariant();
                 }
             }
 
