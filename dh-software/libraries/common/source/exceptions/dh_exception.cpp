@@ -49,9 +49,6 @@ namespace dh
         _extended_message = s.str();
     }
 
-    dh_exception::~dh_exception()
-    {}
-
     const char* dh_exception::c_str() const
     {
         if( !_string_representation_initialized )

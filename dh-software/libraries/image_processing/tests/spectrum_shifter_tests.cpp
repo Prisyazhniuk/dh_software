@@ -1,4 +1,5 @@
 #include "spectrum_shifter.h"
+#include "image_processing.h"
 
 #include <gtest/gtest.h>
 
@@ -7,6 +8,8 @@ using namespace testing;
 
 TEST( spectrum_shifter_tests, works_for_even )
 {
+    image_processing::initialize_ipp();
+
     const Ipp32fc data[] =
     {
         { 1,  101 }, { 2,  102 }, { 3,  103 }, { 4,  104 }, { 5,  105 }, { 6,  106 },
@@ -42,6 +45,8 @@ TEST( spectrum_shifter_tests, works_for_even )
 
 TEST( spectrum_shifter_tests, works_for_odd )
 {
+    image_processing::initialize_ipp();
+
     const Ipp32fc data[] =
     {
         { 1,  101 }, { 2,  102 }, { 3,  103 }, { 4,  104 }, { 5,  105 },

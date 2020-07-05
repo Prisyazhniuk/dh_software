@@ -16,6 +16,8 @@ using namespace testing;
 
 TEST( dft_tests, forward_wrong_src_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     {
         dft dft( 7, 7 );
         auto dst = image_32fc( 7, 7 );
@@ -34,6 +36,8 @@ TEST( dft_tests, forward_wrong_src_throws_exception )
 
 TEST( dft_tests, forward_wrong_dst_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     {
         dft dft( 7, 7 );
         auto src = image_32fc( 7, 7 );
@@ -103,6 +107,8 @@ TEST( dft_tests, forward_works )
 
 TEST( dft_tests, inverse_wrong_src_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     {
         dft dft( 7, 7 );
         auto dst = image_32fc( 7, 7 );
@@ -121,6 +127,8 @@ TEST( dft_tests, inverse_wrong_src_throws_exception )
 
 TEST( dft_tests, inverse_wrong_dst_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     {
         dft dft( 7, 7 );
         auto src = image_32fc( 7, 7 );

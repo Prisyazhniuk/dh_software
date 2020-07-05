@@ -1,5 +1,6 @@
 #include "hologram_processor.h"
 #include "image_converter.h"
+#include "image_processing.h"
 #include "gabor.h"
 #include "dft.h"
 #include "spectrum_shifter.h"
@@ -87,19 +88,13 @@ namespace dh
 
             image_converter::convert_8u_32fc( hologram_8u, hologram_32fc );
 
-            uint8_t max_src;
-            auto status = ippiMax_8u_C1R( hologram_8u.data,
-                                             int( hologram_8u.step ),
-                                             { width, height },
-                                             &max_src );
-            if( status != ippStsNoErr )
-                throw QString("ippiMax_8u_C1R() error: %1").arg( ippGetStatusString( status ) );
+            auto max_src = image_processing::max_8u( hologram_8u );
 
             auto c = Ipp32fc{ float(max_src), 0 };
 
-            status = ippsMulC_32fc_I( c,
-                                      hologram_32fc.data(),
-                                      hologram_32fc.height() * hologram_32fc.step_in_elements() );
+            auto status = ippsMulC_32fc_I( c,
+                                           hologram_32fc.data(),
+                                           hologram_32fc.height() * hologram_32fc.step_in_elements() );
             if( status != ippStsNoErr )
                 throw QString("ippsMulC_32fc_I() error: %1").arg( ippGetStatusString( status ) );
 
@@ -181,6 +176,10 @@ namespace dh
 
             emit statistics_ready( statistics );
         }
+        catch( image_processing_exception& ex )
+        {
+            emit error( ex.c_str() );
+        }
         catch( QString& error_message )
         {
             emit error( error_message );
@@ -189,24 +188,15 @@ namespace dh
 
     void hologram_processor::normalize_32f( Mat& m )
     {
-        const auto width = m.cols;
-        const auto height = m.rows;
-
         float min, max;
-        auto status = ippiMinMax_32f_C1R( m.ptr<float>(),
-                                          int( m.step ),
-                                          { width, height },
-                                          &min,
-                                          &max );
-        if( status != ippStsNoErr )
-            throw QString("ippiMinMax_32f_C1R() error: %1").arg( ippGetStatusString( status ) );
+        image_processing::min_max_32f( m, min, max );
 
         const float sub = min;
         const float div = max-min == 0.0f ? 1 : ( max-min ) / 255.0f;
 
-        status = ippsNormalize_32f_I( m.ptr<float>(),
-                                      height * int( m.step / sizeof(float) ),
-                                      sub, div );
+        auto status = ippsNormalize_32f_I( m.ptr<float>(),
+                                           m.rows * int( m.step / sizeof(float) ),
+                                           sub, div );
         if( status != ippStsNoErr )
             throw QString("ippsNormalize_32f_I() error: %1").arg( ippGetStatusString( status ) );
     }

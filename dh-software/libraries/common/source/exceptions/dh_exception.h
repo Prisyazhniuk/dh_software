@@ -1,6 +1,7 @@
 #pragma once
 
 #include "exception_source.h"
+#include "dh_string.h"
 
 #include <string>
 
@@ -13,7 +14,8 @@ namespace dh
         dh_exception( const std::string& message, const exception_source& );
         dh_exception( const dh_exception* inner_exception, const exception_source& );
         dh_exception( const std::string& message, const dh_exception* inner_exception, const exception_source& );
-        virtual ~dh_exception();
+
+        virtual ~dh_exception() = default;
 
         const char* c_str() const;
 

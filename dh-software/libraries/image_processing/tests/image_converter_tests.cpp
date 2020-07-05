@@ -1,4 +1,5 @@
 #include "image_converter.h"
+#include "image_processing.h"
 
 #include <gtest/gtest.h>
 
@@ -8,6 +9,8 @@ using namespace testing;
 
 TEST( image_converter_tests, convert_8u_32f_different_size_throws_exception )
 {
+    image_processing::initialize_ipp();
+
 	{
         auto image_8u = Mat( 3, 3, CV_8UC1 );
         auto image_32f = Mat( 4, 4, CV_32FC1 );
@@ -27,6 +30,8 @@ TEST( image_converter_tests, convert_8u_32f_different_size_throws_exception )
 
 TEST( image_converter_tests, convert_8u_32f_different_channels_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_8u = Mat( 3, 3, CV_8UC1 );
     auto image_32f = Mat( 3, 3, CV_32FC3 );
 
@@ -35,6 +40,8 @@ TEST( image_converter_tests, convert_8u_32f_different_channels_throws_exception 
 
 TEST( image_converter_tests, convert_8u_32f_wrong_format_throws_exception )
 {
+    image_processing::initialize_ipp();
+
 	{
 		auto image_8u = Mat( 3, 3, CV_32FC1 );
 		auto image_32f = Mat( 3, 3, CV_32FC1 );
@@ -52,6 +59,8 @@ TEST( image_converter_tests, convert_8u_32f_wrong_format_throws_exception )
 
 TEST( image_converter_tests, convert_8u_32f_unsupported_channels_throws_exception )
 {
+    image_processing::initialize_ipp();
+
 	{
 		auto image_8u = Mat( 3, 3, CV_8UC2 );
 		auto image_32f = Mat( 3, 3, CV_32FC2 );
@@ -69,6 +78,8 @@ TEST( image_converter_tests, convert_8u_32f_unsupported_channels_throws_exceptio
 
 TEST( image_converter_tests, convert_8u_32f_c1_works )
 {
+    image_processing::initialize_ipp();
+
 	auto image_8u = Mat( 3, 3, CV_8UC1 );
 	auto image_32f = Mat( 3, 3, CV_32FC1 );
 
@@ -87,6 +98,8 @@ TEST( image_converter_tests, convert_8u_32f_c1_works )
 
 TEST( image_converter_tests, convert_8u_32f_c3_works )
 {
+    image_processing::initialize_ipp();
+
 	auto image_8u = Mat( 3, 3, CV_8UC3 );
 	auto image_32f = Mat( 3, 3, CV_32FC3 );
 
@@ -113,6 +126,8 @@ TEST( image_converter_tests, convert_8u_32f_c3_works )
 
 TEST( image_converter_tests, convert_32f_8u_different_size_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     {
         auto image_32f = Mat( 3, 3, CV_32FC1 );
         auto image_8u = Mat( 4, 4, CV_8UC1 );
@@ -132,6 +147,8 @@ TEST( image_converter_tests, convert_32f_8u_different_size_throws_exception )
 
 TEST( image_converter_tests, convert_32f_8u_different_channels_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_32f = Mat( 3, 3, CV_32FC3 );
     auto image_8u = Mat( 3, 3, CV_8UC1 );
 
@@ -140,6 +157,8 @@ TEST( image_converter_tests, convert_32f_8u_different_channels_throws_exception 
 
 TEST( image_converter_tests, convert_32f_8u_wrong_format_throws_exception )
 {
+    image_processing::initialize_ipp();
+
 	{
 		auto image_32f = Mat( 3, 3, CV_8UC1 );
 		auto image_8u = Mat( 3, 3, CV_8UC1 );
@@ -157,6 +176,8 @@ TEST( image_converter_tests, convert_32f_8u_wrong_format_throws_exception )
 
 TEST( image_converter_tests, convert_32f_8u_unsupported_channels_throws_exception )
 {
+    image_processing::initialize_ipp();
+
 	{
 		auto image_32f = Mat( 3, 3, CV_32FC2 );
 		auto image_8u = Mat( 3, 3, CV_8UC2 );
@@ -174,6 +195,8 @@ TEST( image_converter_tests, convert_32f_8u_unsupported_channels_throws_exceptio
 
 TEST( image_converter_tests, convert_32f_8u_c1_works )
 {
+    image_processing::initialize_ipp();
+
 	auto image_32f = Mat( 3, 3, CV_32FC1 );
 	auto image_8u = Mat( 3, 3, CV_8UC1 );
 
@@ -192,6 +215,8 @@ TEST( image_converter_tests, convert_32f_8u_c1_works )
 
 TEST( image_converter_tests, convert_32f_8u_c3_works )
 {
+    image_processing::initialize_ipp();
+
 	auto image_32f = Mat( 3, 3, CV_32FC3 );
 	auto image_8u = Mat( 3, 3, CV_8UC3 );
 
@@ -218,6 +243,8 @@ TEST( image_converter_tests, convert_32f_8u_c3_works )
 
 TEST( image_converter_tests, convert_8u_32fc_only_one_channel_supported )
 {
+    image_processing::initialize_ipp();
+
     auto image_8u = Mat( 3, 3, CV_8UC3 );
     auto image_32fc = dh::image_32fc( 3, 3 );
     EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
@@ -225,6 +252,8 @@ TEST( image_converter_tests, convert_8u_32fc_only_one_channel_supported )
 
 TEST( image_converter_tests, convert_8u_32fc_wrong_depth_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_8u = Mat( 3, 3, CV_16UC1 );
     auto image_32fc = dh::image_32fc( 3, 3 );
     EXPECT_THROW( image_converter::convert_8u_32fc( image_8u, image_32fc ), argument_exception );
@@ -232,6 +261,8 @@ TEST( image_converter_tests, convert_8u_32fc_wrong_depth_throws_exception )
 
 TEST( image_converter_tests, convert_8u_32fc_different_size_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_8u = Mat( 3, 3, CV_8UC1 );
 
     {
@@ -247,6 +278,8 @@ TEST( image_converter_tests, convert_8u_32fc_different_size_throws_exception )
 
 TEST( image_converter_tests, convert_8u_32fc_works )
 {
+    image_processing::initialize_ipp();
+
     auto image_8u = Mat( 3, 3, CV_8UC1 );
     auto image_32fc = dh::image_32fc( 3, 3 );
 
@@ -268,6 +301,8 @@ TEST( image_converter_tests, convert_8u_32fc_works )
 
 TEST( image_converter_tests, separate_32fc_only_one_channel_supported )
 {
+    image_processing::initialize_ipp();
+
     auto image_32fc = dh::image_32fc( 3, 3 );
 
     auto real_32f_c1 = Mat( 3, 3, CV_32FC1 );
@@ -282,6 +317,8 @@ TEST( image_converter_tests, separate_32fc_only_one_channel_supported )
 
 TEST( image_converter_tests, separate_32fc_invalid_depth_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_32fc = dh::image_32fc( 3, 3 );
 
     auto real_32f = Mat( 3, 3, CV_32FC1 );
@@ -296,6 +333,8 @@ TEST( image_converter_tests, separate_32fc_invalid_depth_throws_exception )
 
 TEST( image_converter_tests, separate_32fc_different_size_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     auto image_32fc = dh::image_32fc( 3, 3 );
 
     auto real_32f = Mat( 3, 3, CV_32FC1 );
@@ -326,6 +365,8 @@ TEST( image_converter_tests, separate_32fc_different_size_throws_exception )
 
 TEST( image_converter_tests, separate_32fc_works )
 {
+    image_processing::initialize_ipp();
+
     auto image_32fc = dh::image_32fc( 3, 3 );
 
     auto real_32f = Mat( 3, 3, CV_32FC1 );
