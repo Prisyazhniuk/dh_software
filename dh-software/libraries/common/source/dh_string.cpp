@@ -11,14 +11,15 @@ namespace dh
     {
         va_list args;
         va_start( args, format );
-
-        auto length = size_t( vsnprintf( nullptr, 0, format, args ) );
-        unique_ptr<char[]> buffer( new char[ length + 1 ] );
-
-        vsnprintf( buffer.get(), length + 1, format, args );
-
+        auto length = size_t( vsnprintf( nullptr, 0, format, args ) ) + 1;
         va_end( args );
 
-        return string( buffer.get(), buffer.get() + length );
+        auto buffer = make_unique<char[]>( length );
+
+        va_start( args, format );
+        vsnprintf( buffer.get(), length, format, args );
+        va_end( args );
+
+        return string( buffer.get(), length - 1 );
     }
 }
