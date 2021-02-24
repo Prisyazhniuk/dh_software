@@ -56,12 +56,12 @@ namespace dh
         _results_tab_bar->addTab( "Интенсивность" );
         _results_tab_bar->addTab( "Реальная часть" );
         _results_tab_bar->addTab( "Мнимая часть" );
-        _results_tab_bar->setTabData( 0, qVariantFromValue(processing_result_type::original) );
-        _results_tab_bar->setTabData( 1, qVariantFromValue(processing_result_type::phase) );
-        _results_tab_bar->setTabData( 2, qVariantFromValue(processing_result_type::amplitude) );
-        _results_tab_bar->setTabData( 3, qVariantFromValue(processing_result_type::intensity) );
-        _results_tab_bar->setTabData( 4, qVariantFromValue(processing_result_type::real) );
-        _results_tab_bar->setTabData( 5, qVariantFromValue(processing_result_type::imaginary) );
+        _results_tab_bar->setTabData( 0, QVariant::fromValue(processing_result_type::original) );
+        _results_tab_bar->setTabData( 1, QVariant::fromValue(processing_result_type::phase) );
+        _results_tab_bar->setTabData( 2, QVariant::fromValue(processing_result_type::amplitude) );
+        _results_tab_bar->setTabData( 3, QVariant::fromValue(processing_result_type::intensity) );
+        _results_tab_bar->setTabData( 4, QVariant::fromValue(processing_result_type::real) );
+        _results_tab_bar->setTabData( 5, QVariant::fromValue(processing_result_type::imaginary) );
 
         connect( _results_tab_bar, &QTabBar::currentChanged, this, &main_window::result_tab_selected );
 
@@ -124,7 +124,6 @@ namespace dh
             view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             view->verticalHeader()->hide();
             view->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-            view->setSizeAdjustPolicy( QAbstractScrollArea::AdjustToContents );
             view->setItemDelegateForRow( 0, new float_item_delegate( 8, 0.0000001, view ) ); // lambda_mm
             view->setItemDelegateForRow( 1, new float_item_delegate( 3, 0.01, view ) ); // sensor_width_mm
             view->setItemDelegateForRow( 2, new float_item_delegate( 3, 0.01, view ) ); // sensor_height_mm
@@ -162,13 +161,11 @@ namespace dh
             _intensity_graph_view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             _intensity_graph_view->verticalHeader()->hide();
             _intensity_graph_view->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-            _intensity_graph_view->setSizeAdjustPolicy( QAbstractScrollArea::AdjustToContents );
             _intensity_graph_view->setEnabled( false );
             dock_layout->addWidget( _intensity_graph_view );
 
             auto intensity_graph = new intensity_graph_widget( central_widget );
             intensity_graph->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
-            intensity_graph->setSizeAdjustPolicy( QAbstractScrollArea::AdjustToContents );
             dock_layout->addWidget( intensity_graph );
 
             dock->setWidget( central_widget );
@@ -200,7 +197,6 @@ namespace dh
             view->verticalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
             view->verticalHeader()->hide();
             view->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-            view->setSizeAdjustPolicy( QAbstractScrollArea::AdjustToContents );
 
             dock->setWidget( view );
             addDockWidget( Qt::LeftDockWidgetArea, dock );
