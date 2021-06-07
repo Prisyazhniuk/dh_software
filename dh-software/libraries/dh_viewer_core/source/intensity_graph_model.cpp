@@ -173,22 +173,23 @@ namespace dh
         return QAbstractTableModel::flags( index );
     }
 
-    void intensity_graph_model::image_processed( const QImage& image )
+    void intensity_graph_model::image_change( const QImage& image )
     {
         if( _first_enable )
         {
             _cursor_1->setPos( 0, image.height()/2 );
             _cursor_2->setPos( image.width()-1, image.height()/2 );
 
-            emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );
-            if( _enabled )
-                calculate_intensity();
+            emit dataChanged( createIndex( 0, 0 ), createIndex( _rows-1, _cols-1 ) );            
         }
         else
         {
             _cursor_1->verify_position();
             _cursor_2->verify_position();
         }
+
+        if( _enabled )
+            calculate_intensity();
     }
 
     void intensity_graph_model::cursor_moved( const QPointF& )

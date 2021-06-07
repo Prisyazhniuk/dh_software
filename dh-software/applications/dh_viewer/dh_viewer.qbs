@@ -2,6 +2,7 @@ import qbs
 
 DhCppApplication {
     name: "dh_viewer"
+    consoleApplication: false
 
     Depends { name: "dh_viewer_core" }
     Depends { name: "qt_helpers" }
@@ -20,5 +21,6 @@ DhCppApplication {
         "main_window.cpp",
         "main_window.h",
         "main_window.ui",
+        "processing_result_type.h",
     ]   
 }

@@ -34,6 +34,7 @@ DhCppStaticLibrary {
         "image_loader.h",
         "intensity_graph_model.cpp",
         "intensity_graph_model.h",
+        "processing_results.h",
         "processing_settings.h",
         "processing_settings_model.cpp",
         "processing_settings_model.h",

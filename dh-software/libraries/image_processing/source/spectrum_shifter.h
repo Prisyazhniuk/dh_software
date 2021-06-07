@@ -1,21 +1,19 @@
 #pragma once
 
-#include "exceptions/argument_exception.h"
-#include "exceptions/image_processing_exception.h"
+#include "image_32fc.h"
 
-#include <opencv2/core.hpp>
-#include <memory>
+#include "exceptions/image_processing_exception.h"
 
 namespace dh
 {
     class spectrum_shifter
     {
     public:
-        spectrum_shifter( int step, int height, int channels );
+        spectrum_shifter( int width, int height );
 
-        void shift( cv::Mat& m );
+        void shift( image_32fc& );
 
     private:
-        std::unique_ptr<uint8_t[]> _buffer;
+        image_32fc _buffer;
     };
 }

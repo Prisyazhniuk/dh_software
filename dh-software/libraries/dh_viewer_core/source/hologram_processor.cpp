@@ -1,5 +1,6 @@
 #include "hologram_processor.h"
 #include "image_converter.h"
+#include "image_processing.h"
 #include "gabor.h"
 #include "dft.h"
 #include "spectrum_shifter.h"
@@ -34,7 +35,7 @@ namespace dh
 
         _processing_thread = dh_thread( "hologram_processor thread",
                                         &hologram_processor::processing_thread,
-                                        this, hologram_8u, settings );
+                                        this, hologram_8u.clone(), settings );
     }
 
     void hologram_processor::stop()
@@ -45,109 +46,158 @@ namespace dh
 
     void hologram_processor::processing_thread( const Mat& hologram_8u, const processing_settings& settings )
     {
-        auto frame_processing_start_time = dh_timer::now_us();
-
-        const auto width = hologram_8u.cols;
-        const auto height = hologram_8u.rows;
-
-        const float pixel_size_w = settings.sensor_width_mm / width;
-        const float pixel_size_h = settings.sensor_height_mm / height;
-        if( abs( pixel_size_h - pixel_size_w ) > 0.00005f )
+        try
         {
-            emit error( "Размер пикселя по ширине и высоте не совпадает" );
-            return;
-        }
+            auto frame_processing_start_time = dh_timer::now_us();
 
-        auto kernel_32fc = image_32fc( width, height );
-        auto kernel_fft_32fc = image_32fc( width, height );
+            const auto width = hologram_8u.cols;
+            const auto height = hologram_8u.rows;
 
-        auto hologram_32fc = image_32fc( width, height );
-        auto hologram_fft_32fc = image_32fc( width, height );
+            const float pixel_size_w = settings.sensor_width_mm / width;
+            const float pixel_size_h = settings.sensor_height_mm / height;
 
-        auto object_32fc = image_32fc( width, height );
-        auto object_fft_32fc = image_32fc( width, height );
+            if( abs( pixel_size_h - pixel_size_w ) > 0.00005f )
+                throw QString("Размер пикселя по ширине и высоте не совпадает");
 
-        auto object_32f = Mat( height, width, CV_32FC1 );
-        auto object_8u = Mat( height, width, CV_8UC1 );
+            auto kernel_32fc = image_32fc( width, height );
+            auto kernel_fft_32fc = image_32fc( width, height );
 
-        dft dft( width, height );
-        spectrum_shifter spectrum_shifter( int( object_8u.step ), height, object_8u.channels() );
+            auto hologram_32fc = image_32fc( width, height );
+            auto hologram_fft_32fc = image_32fc( width, height );
 
+            auto object_32fc = image_32fc( width, height );
+            auto object_fft_32fc = image_32fc( width, height );
 
-        double max_src = 0;
-        minMaxLoc( hologram_8u, nullptr, &max_src );
+            auto magnitudes_32f = Mat( height, width, CV_32FC1 );
+            auto magnitudes_8u = Mat( height, width, CV_8UC1 );
 
-        image_converter::convert_8u_32fc( hologram_8u, hologram_32fc );
+            auto phase_32f = Mat( height, width, CV_32FC1 );
+            auto phase_8u = Mat( height, width, CV_8UC1 );
 
-        auto c = Ipp32fc{ float(max_src), 0 };
-        auto status = ippsMulC_32fc_I( c, hologram_32fc.data(), hologram_32fc.height() * hologram_32fc.step_in_elements() );
+            auto amplitude_32f = Mat( height, width, CV_32FC1 );
+            auto amplitude_8u = Mat( height, width, CV_8UC1 );
 
-        if( status != ippStsNoErr )
-        {
-            emit error( QString("ippsMulC_32fc_I() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
-        }
+            auto intensity_32f = Mat( height, width, CV_32FC1 );
+            auto intensity_8u = Mat( height, width, CV_8UC1 );
 
-        dft.forward( hologram_32fc, hologram_fft_32fc );
+            auto real_32f = Mat( height, width, CV_32FC1 );
+            auto real_8u = Mat( height, width, CV_8UC1 );
 
+            auto imaginary_32f = Mat( height, width, CV_32FC1 );
+            auto imaginary_8u = Mat( height, width, CV_8UC1 );
 
-        gabor::make_kernel( kernel_32fc, settings.lambda_mm, settings.distance_mm, pixel_size_w );
-        dft.forward( kernel_32fc, kernel_fft_32fc );
+            image_converter::convert_8u_32fc( hologram_8u, hologram_32fc );
 
+            auto max_src = image_processing::max_8u( hologram_8u );
 
-        status = ippsMul_32fc( hologram_fft_32fc.data(), kernel_fft_32fc.data(), object_fft_32fc.data(),
-                               hologram_fft_32fc.height() * hologram_fft_32fc.step_in_elements() );
-        if( status != ippStsNoErr )
-        {
-            emit error( QString("ippsMul_32fc() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
-        }
+            auto c = Ipp32fc{ float(max_src), 0 };
 
-        dft.inverse( object_fft_32fc, object_32fc );
+            auto status = ippsMulC_32fc_I( c,
+                                           hologram_32fc.data(),
+                                           hologram_32fc.height() * hologram_32fc.step_in_elements() );
+            if( status != ippStsNoErr )
+                throw QString("ippsMulC_32fc_I() error: %1").arg( ippGetStatusString( status ) );
 
+            dft dft( width, height );
+            dft.forward( hologram_32fc, hologram_fft_32fc );
 
-        status = ippiMagnitude_32fc32f_C1R( object_32fc.data(), object_32fc.step_in_bytes(),
-                                            object_32f.ptr<float>(), int( object_32f.step ),
+            gabor::make_kernel( kernel_32fc, settings.lambda_mm, settings.distance_mm, pixel_size_w );
+            dft.forward( kernel_32fc, kernel_fft_32fc );
+
+            status = ippsMul_32fc( hologram_fft_32fc.data(),
+                                   kernel_fft_32fc.data(),
+                                   object_fft_32fc.data(),
+                                   hologram_fft_32fc.height() * hologram_fft_32fc.step_in_elements() );
+            if( status != ippStsNoErr )
+                throw QString("ippsMul_32fc() error: %1").arg( ippGetStatusString( status ) );
+
+            dft.inverse( object_fft_32fc, object_32fc );
+
+            spectrum_shifter spectrum_shifter( object_32fc.width(), object_32fc.height() );
+            spectrum_shifter.shift( object_32fc );
+
+            status = ippiPhase_32fc32f_C1R( object_32fc.data(),
+                                            object_32fc.step_in_bytes(),
+                                            phase_32f.ptr<float>(),
+                                            int( phase_32f.step ),
                                             { width, height } );
-        if( status != ippStsNoErr )
-        {
-            emit error( QString("ippiMagnitude_32fc32f_C1R() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
-        }
+            if( status != ippStsNoErr )
+                throw QString("ippiPhase_32fc32f_C1R() error: %1").arg( ippGetStatusString( status ) );
 
-        float min, max;
-        status = ippiMinMax_32f_C1R( object_32f.ptr<float>(),
-                                     static_cast<int>( object_32f.step ),
-                                     { width, height }, &min, &max );
-        if( status != ippStsNoErr )
-        {
-            emit error( QString("ippiMinMax_32f_C1R() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
+            status = ippiMagnitude_32fc32f_C1R( object_32fc.data(),
+                                                object_32fc.step_in_bytes(),
+                                                magnitudes_32f.ptr<float>(),
+                                                int( magnitudes_32f.step ),
+                                                { width, height } );
+            if( status != ippStsNoErr )
+                throw QString("ippiMagnitude_32fc32f_C1R() error: %1").arg( ippGetStatusString( status ) );
+
+            status = ippiSqr_32f_C1R( magnitudes_32f.ptr<float>(),
+                                      int(magnitudes_32f.step),
+                                      intensity_32f.ptr<float>(),
+                                      int(intensity_32f.step),
+                                      { width, height } );
+            if( status != ippStsNoErr )
+                throw QString("ippiSqr_32f_C1R() error: %1").arg( ippGetStatusString( status ) );
+
+            image_converter::separate_32fc( object_32fc, real_32f, imaginary_32f );
+
+            normalize_32f( phase_32f );
+            image_converter::convert_32f_8u( phase_32f, phase_8u );
+
+            normalize_32f( magnitudes_32f );
+            image_converter::convert_32f_8u( magnitudes_32f, magnitudes_8u );
+
+            normalize_32f( intensity_32f );
+            image_converter::convert_32f_8u( intensity_32f, intensity_8u );
+
+            normalize_32f( real_32f );
+            image_converter::convert_32f_8u( real_32f, real_8u );
+
+            normalize_32f( imaginary_32f );
+            image_converter::convert_32f_8u( imaginary_32f, imaginary_8u );
+
+            auto results = processing_results
+            {
+                .original = hologram_8u,
+                .phase = phase_8u,
+                .amplitude = magnitudes_8u,
+                .intensity = intensity_8u,
+                .real = real_8u,
+                .imaginary = imaginary_8u
+            };
+
+            emit processed( results );
+
+            auto statistics = processing_statistics
+            {
+                .time_us = dh_timer::now_us() - frame_processing_start_time
+            };
+
+            emit statistics_ready( statistics );
         }
+        catch( image_processing_exception& ex )
+        {
+            emit error( ex.c_str() );
+        }
+        catch( QString& error_message )
+        {
+            emit error( error_message );
+        }
+    }
+
+    void hologram_processor::normalize_32f( Mat& m )
+    {
+        float min, max;
+        image_processing::min_max_32f( m, min, max );
 
         const float sub = min;
         const float div = max-min == 0.0f ? 1 : ( max-min ) / 255.0f;
 
-        status = ippsNormalize_32f_I( object_32f.ptr<float>(),
-                                      height * static_cast<int>( object_32f.step / sizeof(float) ),
-                                      sub, div );
+        auto status = ippsNormalize_32f_I( m.ptr<float>(),
+                                           m.rows * int( m.step / sizeof(float) ),
+                                           sub, div );
         if( status != ippStsNoErr )
-        {
-            emit error( QString("ippsNormalize_32f_I() error: %1").arg( ippGetStatusString( status ) ) );
-            return;
-        }
-
-        image_converter::convert_32f_8u( object_32f, object_8u );
-
-        spectrum_shifter.shift( object_8u );
-
-        auto magnitudes_q = QImage( object_8u.data, object_8u.cols, object_8u.rows,
-                                    static_cast<int>( object_8u.step ), QImage::Format_Grayscale8 );
-
-        emit image_processed( magnitudes_q.copy() );
-
-        processing_statistics statistics;
-        statistics.time_us = dh_timer::now_us() - frame_processing_start_time;
-        emit statistics_ready( statistics );
+            throw QString("ippsNormalize_32f_I() error: %1").arg( ippGetStatusString( status ) );
     }
 }

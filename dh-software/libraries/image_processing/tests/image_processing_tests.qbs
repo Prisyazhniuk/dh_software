@@ -10,6 +10,7 @@ DhUnitTests {
         "gabor_tests.cpp",
         "image_32fc_tests.cpp",
         "image_converter_tests.cpp",
+        "image_processing_tests.cpp",
         "spectrum_shifter_tests.cpp",
     ]    
 }

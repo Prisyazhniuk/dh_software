@@ -16,6 +16,7 @@
 #include <QDockWidget>
 
 using namespace std;
+using namespace cv;
 
 namespace dh
 {
@@ -23,6 +24,7 @@ namespace dh
                               QWidget *parent )
         : QMainWindow( parent )
         , _hologram_processor( hologram_processor )
+        , _processing_results( {} )
         , _ui( new Ui::main_window )
         , _settings_working_path_key( "working_path" )
         , _settings_save_path_key( "save_path" )
@@ -30,8 +32,8 @@ namespace dh
         if( !hologram_processor )
             throw argument_exception( "hologram_processor is null", get_exception_source() );
 
-        connect( _hologram_processor, &hologram_processor::image_processed,
-                 this, &main_window::image_processed );
+        connect( _hologram_processor, &hologram_processor::processed,
+                 this, &main_window::processed );
 
         connect( _hologram_processor, &hologram_processor::error,
                  this, &main_window::error_notified );
@@ -45,6 +47,25 @@ namespace dh
 
         _scene = new QGraphicsScene( this );
         _scene_item = _scene->addPixmap( QPixmap() );
+
+        _results_tab_bar = new QTabBar( this );
+        _results_tab_bar->setExpanding( false );
+        _results_tab_bar->addTab( "Оригинал" );
+        _results_tab_bar->addTab( "Фаза" );
+        _results_tab_bar->addTab( "Амплитуда" );
+        _results_tab_bar->addTab( "Интенсивность" );
+        _results_tab_bar->addTab( "Реальная часть" );
+        _results_tab_bar->addTab( "Мнимая часть" );
+        _results_tab_bar->setTabData( 0, qVariantFromValue(processing_result_type::original) );
+        _results_tab_bar->setTabData( 1, qVariantFromValue(processing_result_type::phase) );
+        _results_tab_bar->setTabData( 2, qVariantFromValue(processing_result_type::amplitude) );
+        _results_tab_bar->setTabData( 3, qVariantFromValue(processing_result_type::intensity) );
+        _results_tab_bar->setTabData( 4, qVariantFromValue(processing_result_type::real) );
+        _results_tab_bar->setTabData( 5, qVariantFromValue(processing_result_type::imaginary) );
+
+        connect( _results_tab_bar, &QTabBar::currentChanged, this, &main_window::result_tab_selected );
+
+        _ui->graphics_view_layout->addWidget( _results_tab_bar );
 
         _graphics_view = new graphics_view( this );
         _graphics_view->set_scene( _scene );
@@ -155,8 +176,8 @@ namespace dh
 
             _ui->view_menu->addAction( dock->toggleViewAction() );
 
-            QObject::connect( _hologram_processor, &hologram_processor::image_processed,
-                              _intensity_graph_model, &intensity_graph_model::image_processed );
+            QObject::connect( this, &main_window::image_shown,
+                              _intensity_graph_model, &intensity_graph_model::image_change );
 
             QObject::connect( _intensity_graph_model, &intensity_graph_model::plot,
                               intensity_graph, &intensity_graph_widget::plot );
@@ -200,18 +221,14 @@ namespace dh
         delete _ui;
     }
 
-    void main_window::image_processed( const QImage& image )
+    void main_window::processed( const processing_results& results )
     {
-        auto pixmap = QPixmap::fromImage( image );
+        _processing_results = results;
 
-        lock_guard<mutex> lock( _scene_item_mutex );
+        auto current_tab = _results_tab_bar->currentIndex();
+        auto result_type = _results_tab_bar->tabData( current_tab ).value<processing_result_type>();
 
-        if( _scene_item->pixmap().rect() != pixmap.rect() )
-            _scene->setSceneRect( pixmap.rect() );
-
-        _scene_item->setPixmap( pixmap );
-
-        _intensity_graph_view->setEnabled( true );
+        show_results( result_type );
     }
 
     void main_window::error_notified( const QString& message )
@@ -322,6 +339,13 @@ namespace dh
         }
     }
 
+    void main_window::result_tab_selected( int id )
+    {
+        auto result_type = _results_tab_bar->tabData( id ).value<processing_result_type>();
+
+        show_results( result_type );
+    }
+
     optional<QString> main_window::execute_file_dialog( const QString& caption, const QString& path,
                                                         QFileDialog::AcceptMode accept_mode,
                                                         QFileDialog::FileMode file_mode, bool set_all_files_filter )
@@ -389,5 +413,57 @@ namespace dh
         {
             _file_system_view->setCurrentIndex( index );
         }
+    }
+
+    void main_window::show_results( processing_result_type type )
+    {
+        optional<Mat> mat = nullopt;
+
+        switch( type )
+        {
+            case processing_result_type::original:
+                mat = _processing_results.original;
+                break;
+
+            case processing_result_type::phase:
+                mat = _processing_results.phase;
+                break;
+
+            case processing_result_type::amplitude:
+                mat = _processing_results.amplitude;
+                break;
+
+            case processing_result_type::intensity:
+                mat = _processing_results.intensity;
+                break;
+
+            case processing_result_type::real:
+                mat = _processing_results.real;
+                break;
+
+            case processing_result_type::imaginary:
+                mat = _processing_results.imaginary;
+                break;
+        }
+
+        if( !mat )
+        {
+            mat = Mat();
+        }
+
+        auto& m = mat.value();
+        auto image = QImage( m.data, m.cols, m.rows, static_cast<int>( m.step ), QImage::Format_Grayscale8 );
+        auto pixmap = QPixmap::fromImage( image );
+
+        lock_guard<mutex> lock( _scene_item_mutex );
+
+        if( _scene_item->pixmap().rect() != pixmap.rect() )
+            _scene->setSceneRect( pixmap.rect() );
+
+        _scene_item->setPixmap( pixmap );
+
+        emit image_shown( image );
+
+        _intensity_graph_view->setEnabled( true );
     }
 }

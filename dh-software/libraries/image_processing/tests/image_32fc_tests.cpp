@@ -8,12 +8,16 @@ using namespace testing;
 
 TEST( image_32fc_tests, constructor_not_positive_sizes_throws_exception )
 {
+    image_processing::initialize_ipp();
+
     EXPECT_THROW( image_32fc( 0, 1 ), argument_exception );
     EXPECT_THROW( image_32fc( 1, 0 ), argument_exception );
 }
 
 TEST( image_32fc_tests, sizes_is_correct )
 {
+    image_processing::initialize_ipp();
+
     image_32fc image( 10, 15 );
     EXPECT_EQ( 10, image.width() );
     EXPECT_EQ( 15, image.height() );
@@ -21,6 +25,8 @@ TEST( image_32fc_tests, sizes_is_correct )
 
 TEST( image_32fc_tests, step_in_bytes_is_correct )
 {
+    image_processing::initialize_ipp();
+
     {
         image_32fc image( 1, 15 );
         EXPECT_EQ( 64, image.step_in_bytes() );
@@ -34,6 +40,8 @@ TEST( image_32fc_tests, step_in_bytes_is_correct )
 
 TEST( image_32fc_tests, step_in_elements_is_correct )
 {
+    image_processing::initialize_ipp();
+
     {
         image_32fc image( 1, 15 );
         auto expected_step = int( 64 / sizeof(Ipp32fc) );
@@ -50,6 +58,8 @@ TEST( image_32fc_tests, step_in_elements_is_correct )
 
 TEST( image_32fc_tests, at_works )
 {
+    image_processing::initialize_ipp();
+
     image_32fc image( 2, 2 );
 
     image.at( 0, 0 ) = { 1, 11 };
@@ -76,12 +86,16 @@ TEST( image_32fc_tests, at_works )
 
 TEST( image_32fc_tests, data_is_correct )
 {
+    image_processing::initialize_ipp();
+
     image_32fc image( 10, 10 );
     EXPECT_TRUE( image.data() != nullptr );
 }
 
 TEST( image_32fc_tests, constructor_with_initizlization_works )
 {
+    image_processing::initialize_ipp();
+
     const Ipp32fc data[] = { { 1, 11 }, { 2, 22 },
                              { 3, 33 }, { 4, 44 },
                              { 5, 55 }, { 6, 66 } };

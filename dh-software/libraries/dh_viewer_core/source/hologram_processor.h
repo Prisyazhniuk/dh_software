@@ -2,12 +2,9 @@
 
 #include "error_reporter.h"
 #include "processing_settings.h"
+#include "processing_results.h"
 #include "processing_statistics.h"
 #include "dh_thread.h"
-
-#include <QImage>
-
-#include <opencv2/core.hpp>
 
 namespace dh
 {
@@ -22,13 +19,15 @@ namespace dh
         void stop();
 
     signals:
-        void image_processed( const QImage& );
+        void processed( const processing_results& );
         void statistics_ready( const processing_statistics& );
 
     private:
         void processing_thread( const cv::Mat& hologram_8u, const processing_settings& );
 
+        void normalize_32f( cv::Mat& );
+
     private:
-        dh_thread _processing_thread;        
+        dh_thread _processing_thread;
     };
 }
