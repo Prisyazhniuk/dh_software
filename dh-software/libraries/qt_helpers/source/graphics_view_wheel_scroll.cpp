@@ -15,7 +15,7 @@ namespace dh
     {
         if( e->modifiers() & Qt::ControlModifier )
         {
-            if( e->delta() > 0 )
+            if( e->angleDelta().y() > 0 )
                 emit zoom_in( _zoom_step );
             else
                 emit zoom_out( _zoom_step );
