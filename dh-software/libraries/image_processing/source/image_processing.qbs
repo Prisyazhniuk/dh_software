@@ -10,7 +10,7 @@ DhCppStaticLibrary {
     }
 
     additionalStaticLibraries: [
-        "opencv_world400",
+        "opencv_world451",
         "ippcore",
         "ippi",
         "ipps",
@@ -38,7 +38,7 @@ DhCppStaticLibrary {
         qbs.install: true
         qbs.installDir: "bin"
         files: [
-            project.opencv_bin_path.concat("/libopencv_world400.dll"),
+            project.opencv_bin_path.concat("/libopencv_world451.dll"),
             project.ipp_bin_path.concat("/ippcore.dll"),
             project.ipp_bin_path.concat("/ippi*.dll"),
             project.ipp_bin_path.concat("/ipps*.dll"),

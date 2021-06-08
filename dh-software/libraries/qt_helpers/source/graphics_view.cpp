@@ -104,9 +104,9 @@ namespace dh
     {
         qreal scale = qPow( qreal(2), ( _zoom_slider->value() - _initional_zoom ) / _zoom_devider );
 
-        QMatrix matrix;
-        matrix.scale( scale, scale );
+        QTransform transform;
+        transform.scale( scale, scale );
 
-        _graphics_view->setMatrix( matrix );
+        _graphics_view->setTransform( transform );
     }
 }
